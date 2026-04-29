@@ -9,6 +9,7 @@ source = { editable = "." }
 dependencies = [
     { name = "h5py" },
     { name = "numpy" },
+    { name = "pygadgetreader" },
     { name = "pylians" },
     { name = "scipy" },
     { name = "voxelize" },
@@ -18,6 +19,7 @@ dependencies = [
 requires-dist = [
     { name = "h5py" },
     { name = "numpy" },
+    { name = "pygadgetreader", git = "https://github.com/dnarayanan/pygadgetreader" },
     { name = "pylians" },
     { name = "scipy" },
     { name = "voxelize", git = "https://github.com/smsutherland/voxelize" },
@@ -211,6 +213,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/c7/ba88f0b5d81ae0732a2cb2900c52924ddfa6b1623e511533c022a558e058/pyfftw-0.15.1-cp314-cp314-win_amd64.whl", hash = "sha256:558c318a1aea81ce2083309c927fd881ccf9c285c5571ce965bb7b18dc4291fd", size = 2660474, upload-time = "2025-10-22T19:58:50.93Z" },
     { url = "https://files.pythonhosted.org/packages/15/27/0e6195c9c5eeef73a7499772621057aff5ffd04ebb52a71d49cc049a3dad/pyfftw-0.15.1-pp311-pypy311_pp73-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5e957f5caa7ccc032d17831ce336cb61b93f516ed7da25ea6c9e1086ed2e323f", size = 2570541, upload-time = "2025-10-22T19:58:53.357Z" },
     { url = "https://files.pythonhosted.org/packages/2e/a9/f1d00acce882645198576a94c4b7fff5465f0bb6c4b7bb1005314527c2d0/pyfftw-0.15.1-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:763cd58e858133493db371ed3a63e9e41463cd40965e2375a079947c2d96805f", size = 2625398, upload-time = "2025-10-22T19:58:54.893Z" },
+]
+
+[[package]]
+name = "pygadgetreader"
+version = "2.6"
+source = { git = "https://github.com/dnarayanan/pygadgetreader#bea9c958592b6435d8fd907007e19a15be76486a" }
+dependencies = [
+    { name = "h5py" },
+    { name = "numpy" },
 ]
 
 [[package]]

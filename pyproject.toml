@@ -12,7 +12,8 @@ dependencies = [
     "h5py",
     "scipy",
     "Pylians",
-    "voxelize@git+https://github.com/smsutherland/voxelize"
+    "voxelize@git+https://github.com/smsutherland/voxelize",
+    "pygadgetreader@git+https://github.com/dnarayanan/pygadgetreader",
 ]
 
 [project.scripts]
@@ -21,7 +22,7 @@ make-Pk = "camels_post.make_Pk:main"
 make-mesh = "camels_post.make_mesh:main"
 disperse2hdf5 = "camels_post.disperse2hdf5:main"
 postprocess = "camels_post.postprocess:main"
-gadget1to2 = "camels_post.gadget1to2:main"
+combine-IC = "camels_post.combine_IC:main"
 
 [build-system]
 requires = ["hatchling"]
