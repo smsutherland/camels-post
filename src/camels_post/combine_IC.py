@@ -69,6 +69,7 @@ def copy_ic(source: str, destination: str):
             chunks=True,
             compression="gzip",
             fletcher32=True,
+            shuffle=True
         )
 
         for gadget_name, gadget_type, hdf5_name in fields:
