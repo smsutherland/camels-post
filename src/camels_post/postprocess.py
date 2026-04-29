@@ -38,7 +38,7 @@ def main():
     parser.add_argument(
         "--preset",
         help="Which preset post-processing configuration to use?",
-        choices=["swimba"],
+        choices=["swimba", "gadget"],
         default="swimba",
     )
     args = parser.parse_args()
