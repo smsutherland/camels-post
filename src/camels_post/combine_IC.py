@@ -53,8 +53,9 @@ def copy_ic(source: str, destination: str):
             fields += [
                 ("pos", "dm", "PartType1/Coordinates"),
                 ("vel", "dm", "PartType1/Velocities"),
-                ("mass", "dm", "PartType1/Masses"),
                 ("pid", "dm", "PartType1/ParticleIDs"),
+                # Masses are handled specially because of masstable
+                # ("mass", "dm", "PartType1/Masses"),
             ]
         if original_header["ngas"] > 0:
             fields += [
@@ -64,40 +65,68 @@ def copy_ic(source: str, destination: str):
                 ("pid", "gas", "PartType0/ParticleIDs"),
             ]
 
-        for gadget_name, gadget_type, swift_name in fields:
+        hdf5_kwargs = dict(
+            chunks=True,
+            compression="gzip",
+            fletcher32=True,
+        )
+
+        for gadget_name, gadget_type, hdf5_name in fields:
             data = pygadgetreader.readsnap(source, gadget_name, gadget_type)
-            if gadget_name == "pos":
-                # Make sure coordinates are withing the size of the box
-                # Wrap them around if they're not.
-                data %= header["BoxSize"]
-            f[swift_name] = data
+            f.create_dataset(
+                hdf5_name, data=data, **hdf5_kwargs
+            )
 
-        # Set smoothing lengths to mean inter-particle separation
-        hsm = header["BoxSize"] / np.cbrt(original_header["ngas"])
-        f["PartType0/SmoothingLength"] = hsm * np.ones(original_header["ngas"])
+        if original_header["ndm"] > 0:
+            # Special case of DM masses
+            try:
+                dm_mass = pygadgetreader.readsnap(source, "mass", "dm")
+            except KeyError:
+                # masses don't exist. Use value from mass_table
+                dm_mass = np.full(original_header["ndm"], original_header["massTable"][1])
+            f.create_dataset(
+                "PartType1/Masses",
+                data=dm_mass,
+                **hdf5_kwargs
+            )
 
-        # Write internal energies
-        # based on code from monofonic
-        gamma = 5 / 3
-        YHe = 0.2457519853817943
-        M_gas = f["PartType0/Masses"][:].sum()
-        M_dm = f["PartType1/Masses"][:].sum()
-        Omega_b = M_gas / (M_gas + M_dm) * original_header["O0"]
-        Tcmb0 = 2.7255
+        if original_header["ngas"] > 0:
+            # Set smoothing lengths to mean inter-particle separation
+            hsm = header["BoxSize"] / np.cbrt(original_header["ngas"])
+            f.create_dataset(
+                "PartType0/SmoothingLength",
+                data=hsm * np.ones(original_header["ngas"]),
+                **hdf5_kwargs
+            )
 
-        npol = 1 / (gamma - 1) if math.fabs(1.0 - gamma) > 1e-7 else 1
-        unitv = 1e5
-        adec = 1.0 / (160.0 * (Omega_b * h * h / 0.022) ** (2.0 / 5.0))
-        Tini = Tcmb0 / a if a < adec else Tcmb0 / a / a * adec
-        mu = 4.0 / (8.0 - 5.0 * YHe) if Tini > 1e4 else 4.0 / (1.0 + 3.0 * (1.0 - YHe))
-        energy = 1.3806e-16 / 1.6726e-24 * Tini * npol / mu / unitv / unitv
-        energies = np.full(original_header["ngas"], energy)
-        f["PartType0/InternalEnergy"] = energies
+            # Write internal energies
+            # based on code from monofonic
+            gamma = 5 / 3
+            YHe = 0.2457519853817943
+            M_gas = f["PartType0/Masses"][:].sum()
+            M_dm = f["PartType1/Masses"][:].sum()
+            Omega_b = M_gas / (M_gas + M_dm) * original_header["O0"]
+            Tcmb0 = 2.7255
+
+            npol = 1 / (gamma - 1) if math.fabs(1.0 - gamma) > 1e-7 else 1
+            unitv = 1e5
+            adec = 1.0 / (160.0 * (Omega_b * h * h / 0.022) ** (2.0 / 5.0))
+            Tini = Tcmb0 / a if a < adec else Tcmb0 / a / a * adec
+            mu = 4.0 / (8.0 - 5.0 * YHe) if Tini > 1e4 else 4.0 / (1.0 + 3.0 * (1.0 - YHe))
+            energy = 1.3806e-16 / 1.6726e-24 * Tini * npol / mu / unitv / unitv
+            energies = np.full(original_header["ngas"], energy)
+            f.create_dataset(
+                "PartType0/InternalEnergy",
+                data=energies,
+                **hdf5_kwargs
+            )
 
         # Make sure all particles are in the box.
         # Sometimes the conversion results in particles just barely outside the box.
-        f["PartType0/Coordinates"][:] %= header["BoxSize"]
-        f["PartType1/Coordinates"][:] %= header["BoxSize"]
+        if original_header["ngas"] > 0:
+            f["PartType0/Coordinates"][:] %= header["BoxSize"]
+        if original_header["ndm"] > 0:
+            f["PartType1/Coordinates"][:] %= header["BoxSize"]
 
 
 if __name__ == "__main__":
