@@ -1,0 +1,31 @@
+[project]
+name = "camels-post"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Sagan Sutherland", email = "sagan.sutherland@uconn.edu" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "h5py",
+    "scipy",
+    "Pylians",
+    "voxelize@git+https://github.com/smsutherland/voxelize"
+]
+
+[project.scripts]
+make-CMD = "camels_post.make_CMD:main"
+make-Pk = "camels_post.make_Pk:main"
+make-mesh = "camels_post.make_mesh:main"
+disperse2hdf5 = "camels_post.disperse2hdf5:main"
+postprocess = "camels_post.postprocess:main"
+gadget1to2 = "camels_post.gadget1to2:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
