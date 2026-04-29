@@ -35,32 +35,40 @@ def main():
         action="store_true",
         help="Make post-processing jobs start over",
     )
+    parser.add_argument(
+        "--preset",
+        help="Which preset post-processing configuration to use?",
+        choices=["swimba"],
+        default="swimba",
+    )
     args = parser.parse_args()
-    dirs: list[Path] = args.dirs
+    dirs: set[Path] = set(d.resolve() for d in args.dirs)
     target: Path = args.target
     parallel: int = args.parallel
     ntasks: int = min(args.ntasks, len(dirs))
     force: bool = args.force
     force_flag: str = " -f" if force else ""
-
-    post_script = Path(__file__).parent / "./data/post_processing.sh"
+    preset: str = args.preset
 
     target.mkdir(exist_ok=True)
+
+    shutil.copy(
+        Path(__file__).parent / "presets" / (preset + ".sh"), target / "post_process.sh"
+    )
+    shutil.copy(Path(__file__).parent / "check.sh", target / "check.sh")
+
+    post_process_path = target / "post_process.sh"
+    check_path = target / "check.sh"
 
     disbatch_script = target / "tasks"
     with open(disbatch_script, "w") as f:
         f.write("#DISBATCH PREFIX cd \n")
         f.write(
-            f"#DISBATCH SUFFIX ; (bash post_processing.sh {force_flag}) &{'>' if force else '>>'} post_processing.log\n"
+            f"#DISBATCH SUFFIX ; (bash {post_process_path} {force_flag}) &{'>' if force else '>>'} post_processing.log\n"
         )
 
-        paths = set()
         for path in dirs:
-            shutil.copy(post_script, path)
-            path = str(path.resolve())
-            if path not in paths:
-                f.write(path + "\n")
-                paths.add(path)
+            f.write(str(path) + "\n")
 
     sbatch_script = target / "job.sh"
     with open(sbatch_script, "w") as f:
@@ -71,3 +79,13 @@ def main():
         f.write("#SBATCH --partition=cmbas\n")
         f.write("module load disBatch\n")
         f.write("disBatch tasks\n")
+
+    disbatch_check = target / "check_tasks"
+    with open(disbatch_check, "w") as f:
+        f.write("#DISBATCH PREFIX cd \n")
+        f.write(
+            f"#DISBATCH SUFFIX ; (bash {check_path}) &{'>' if force else '>>'} post_processing.log\n"
+        )
+
+        for path in dirs:
+            f.write(str(path) + "\n")

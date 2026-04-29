@@ -1,5 +1,4 @@
 #!/bin/env python
-import ast
 import math
 import sys
 
@@ -48,16 +47,21 @@ def copy_ic(source: str, destination: str):
         f_header = f.create_group("Header")
         f_header.attrs.update(header)
 
-        fields = [
-            ("pos", "gas", "PartType0/Coordinates"),
-            ("vel", "gas", "PartType0/Velocities"),
-            ("mass", "gas", "PartType0/Masses"),
-            ("pid", "gas", "PartType0/ParticleIDs"),
-            ("pos", "dm", "PartType1/Coordinates"),
-            ("vel", "dm", "PartType1/Velocities"),
-            ("mass", "dm", "PartType1/Masses"),
-            ("pid", "dm", "PartType1/ParticleIDs"),
-        ]
+        fields = []
+        if original_header["ndm"] > 0:
+            fields += [
+                ("pos", "dm", "PartType1/Coordinates"),
+                ("vel", "dm", "PartType1/Velocities"),
+                ("mass", "dm", "PartType1/Masses"),
+                ("pid", "dm", "PartType1/ParticleIDs"),
+            ]
+        if original_header["ngas"] > 0:
+            fields += [
+                ("pos", "gas", "PartType0/Coordinates"),
+                ("vel", "gas", "PartType0/Velocities"),
+                ("mass", "gas", "PartType0/Masses"),
+                ("pid", "gas", "PartType0/ParticleIDs"),
+            ]
 
         for gadget_name, gadget_type, swift_name in fields:
             data = pygadgetreader.readsnap(source, gadget_name, gadget_type)
