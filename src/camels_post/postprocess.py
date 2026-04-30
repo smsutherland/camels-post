@@ -1,4 +1,3 @@
-import shutil
 import argparse
 from pathlib import Path
 
@@ -8,8 +7,8 @@ def main():
     parser.add_argument(
         "dirs",
         type=Path,
-        nargs="*",
-        help="Where to start looking for simulations to post-process",
+        nargs="+",
+        help="Where to look for simulations to post-process",
     )
     parser.add_argument(
         "--target",
@@ -18,13 +17,15 @@ def main():
         default=Path.cwd(),
     )
     parser.add_argument(
-        "--parallel",
+        "--cpus-per-task",
+        "-c",
         type=int,
         default=16,
-        help="How much parallelization should each post-processing task use?",
+        help="How many cpus should each post-processing task use?",
     )
     parser.add_argument(
         "--ntasks",
+        "-n",
         type=int,
         default=32,
         help="How many post-processing tasks should run at once?",
@@ -38,13 +39,13 @@ def main():
     parser.add_argument(
         "--preset",
         help="Which preset post-processing configuration to use?",
-        choices=["swimba", "gadget"],
+        choices=["swimba", "gadget-nbody"],
         default="swimba",
     )
     args = parser.parse_args()
     dirs: set[Path] = set(d.resolve() for d in args.dirs)
     target: Path = args.target.resolve()
-    parallel: int = args.parallel
+    parallel: int = args.cpus_per_task
     ntasks: int = min(args.ntasks, len(dirs))
     force: bool = args.force
     force_flag: str = " -f" if force else ""
