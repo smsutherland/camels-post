@@ -605,10 +605,10 @@ function run-Pk() {
 	if [ ${#pk_files[@]} -ge 460 ]; then
 		return
 	fi
-	compute-Pk "$(get-gadget-snapshot "${ALL_SNAPS[-1]}" | sed 's/\(.*\)_.*/\1/')"_*.hdf5 --parallel "${cpus}" --target "${PK_OUTPUT}"
+	make-Pk "$(get-gadget-snapshot "${ALL_SNAPS[-1]}" | sed 's/\(.*\)_.*/\1/')"_*.hdf5 --parallel "${cpus}" --target "${PK_OUTPUT}"
 	ic="$(get-gadget-ic)"
 	if [ -e "$ic" ]; then
-		compute-Pk "$ic" --parallel "$cpus" --target "${PK_OUTPUT}"
+		make-Pk "$ic" --parallel "$cpus" --target "${PK_OUTPUT}"
 	fi
 }
 
