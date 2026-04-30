@@ -21,6 +21,8 @@ result=0
 ensure_count "subfind/fof_subhalo_tab_*" $n_snap
 ensure_exists sublink/tree.hdf5 sublink/tree_extended.hdf5
 ensure_count "sublink/offsets/offsets_*.hdf5" $n_snap
+ensure_exists sublink_gal/tree.hdf5 sublink_gal/tree_extended.hdf5
+ensure_count "sublink_gal/offsets/offsets_*.hdf5" $n_snap
 ensure_exists rockstar/trees/tree_0_0_0.dat rockstar/trees/locations.dat rockstar/trees/forests.list
 ensure_count rockstar/hlists/ $(($n_snap - 20)) # This isn't an exact count since it'll skip snapshots with not enough halos
 ensure_count CMD/2D_maps 12
