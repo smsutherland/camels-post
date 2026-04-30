@@ -43,7 +43,7 @@ def main():
     )
     args = parser.parse_args()
     dirs: set[Path] = set(d.resolve() for d in args.dirs)
-    target: Path = args.target
+    target: Path = args.target.resolve()
     parallel: int = args.parallel
     ntasks: int = min(args.ntasks, len(dirs))
     force: bool = args.force
@@ -62,10 +62,8 @@ def main():
 
     with open(target / "post_process.sh", "w") as f:
         f.write(post_process_file)
-    shutil.copy(Path(__file__).parent / "check.sh", target / "check.sh")
 
     post_process_path = target / "post_process.sh"
-    check_path = target / "check.sh"
 
     disbatch_script = target / "tasks"
     with open(disbatch_script, "w") as f:
@@ -91,7 +89,7 @@ def main():
     with open(disbatch_check, "w") as f:
         f.write("#DISBATCH PREFIX cd \n")
         f.write(
-            f"#DISBATCH SUFFIX ; (bash {check_path}) &{'>' if force else '>>'} post_processing.log\n"
+            f"#DISBATCH SUFFIX ; (bash {post_process_path} check) &>> post_processing.log\n"
         )
 
         for path in dirs:
