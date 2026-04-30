@@ -8,7 +8,7 @@ function get-gadget-snapshot() {
 }
 
 function get-gadget-ic() {
-    echo "./ICs/ic_combined.hdf5"
+	echo "./ICs/ic_combined.hdf5"
 }
 
 # This step is necessary for SWIMBA because many of the steps don't work natively with swift-style snapshots.
@@ -16,7 +16,7 @@ function get-gadget-ic() {
 # CLEAN_GADGET_SNAPS and CONVERT_SNAPSHOTS
 function convert-snaps() {
 	if [ ! -e "./ICs/ic_combined.hdf5" ]; then
-        combine-IC "ICs/ics" "ICs/ic_combined.hdf5"
+		combine-IC "ICs/ics" "ICs/ic_combined.hdf5"
 	fi
 }
 
@@ -24,7 +24,7 @@ function convert-snaps() {
 # For example, in SWIMBA I put the converted snapshots in node-local scratch storage.
 # Slurm on rusty will clean this up itself, but it's better to clean it up myself.
 function cleanup() {
-	rm -r "/scratch/${SIM_ROOT}/"
+	:
 }
 
 # Get softening in Mpc / h
@@ -39,29 +39,31 @@ function cleanup() {
 # At the very least, it should support particle types 0-4 since those are expected to be in the Subfind parameter file.
 # TODO: CHECK SOFTENING UNITS FOR SUBFIND
 function get-softening() {
-	h=$(sed -ne 's/^\s*h: //p' params.yml)
-	l=$(
-		if [ "$2" = "comoving" ]; then
-			case $1 in
-			1 | 2)
-				sed -ne 's/^\s*comoving_DM_softening: //p' params.yml
-				;;
-			0 | 3 | 4 | 5)
-				sed -ne 's/^\s*comoving_baryon_softening: //p' params.yml
-				;;
-			esac
-		elif [ "$2" = "physical" ]; then
-			case $1 in
-			1 | 2)
-				sed -ne 's/^\s*max_physical_DM_softening: //p' params.yml
-				;;
-			0 | 3 | 4 | 5)
-				sed -ne 's/^\s*max_physical_baryon_softening: //p' params.yml
-				;;
-			esac
-		fi
-	)
-	bc <<<"$l * $h * 1000"
+	case $1 in
+	0)
+		type=Gas
+		;;
+	1)
+		type=Halo
+		;;
+	2)
+		type=Disk
+		;;
+	3)
+		type=Bulge
+		;;
+	4)
+		type=Stars
+		;;
+	esac
+	if [ "$2" = "comoving" ]; then
+		suffix="MaxPhys"
+	else
+		suffix=""
+	fi
+	param="Softening${type}${suffix}"
+	# -w needed to prevent SofteningGasMaxPhys from showing up in SofteningGas
+	grep -w "$param" parameters-usedvalues | awk '{print($2)}'
 }
 
 # ALL_SNAPS should be an array containing every snapshot number we're outputting.
@@ -72,6 +74,7 @@ mapfile -t ALL_SNAPS < <(seq 0 90)
 # Note that some steps depend on previous steps, so changing one output can break later steps.
 SUBFIND_OUTPUT=./subfind/
 SUBLINK_OUTPUT=./sublink/
+SUBLINK_GAL_OUTPUT=./sublink_gal/
 ROCKSTAR_OUTPUT=./rockstar/
 CMD_OUTPUT=./CMD/
 PK_OUTPUT=./Pk/

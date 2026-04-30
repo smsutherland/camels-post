@@ -55,6 +55,13 @@ PRESET_OPTIONS
 set -e
 
 function main() {
+	if [ "$1" = "check" ]; then
+		check
+		# Thechnically not necessary since check calls exit
+		# But keeping this here conveys the semantics of what happens here locally
+		return
+	fi
+
 	OPTS=$(getopt -a -n post_processing.sh --options "p:,f" --longoptions "parallel:,force" -- "$@")
 	eval set -- "$OPTS"
 
@@ -86,6 +93,8 @@ function main() {
 	pwd=$(pwd)
 	pwd_without_leading=${pwd#/}
 	export SIM_ROOT=${pwd_without_leading////-}
+	module load uv
+	export HDF5_PLUGIN_PATH=$(uv run --with hdf5plugin python -c "import hdf5plugin; print(hdf5plugin.PLUGIN_PATH)")
 
 	# If -f or --force, remove all generated post-processing so we can start fresh
 	# If you only want to re-run one particular part of the pipeline, you'll have to manually delete it's corresponding outputs.
@@ -400,7 +409,7 @@ function run-sublink() {
 		rm -r -- "${SUBLINK_OUTPUT}/subfind"
 	fi
 
-	# Subhalos version
+	# Galaxies version
 	if ! ([ -e "${SUBLINK_GAL_OUTPUT}/tree.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]); then
@@ -572,16 +581,30 @@ function run-cmd() {
 	# It's mainly based on Paco's CMD code, but I've remade it from scratch to hopefully make it a bit easier to extend.
 	# I've also made it parallelized without using mpi, since I've historically had consistency issues with mpi4py.
 
+	module load modules/2.4-20250724
+	module load gcc/13.3.0
+	module load eigen/3.4.0
+
+	snapshot="$(get-gadget-snapshot "${ALL_SNAPS[0]}")"
+	module load hdf5
+	if h5ls "${snapshot}/PartType0" &>/dev/null; then
+		target_2d=12
+		target_3d=180
+	else
+		target_2d=1
+		target_3d=15
+	fi
+
 	mkdir -p "${CMD_OUTPUT}/2D_maps"
 	mkdir -p "${CMD_OUTPUT}/3D_grids"
 	# Currently I've got 12 fields I'm maping for the CMD. Should that number change, it should change here as well.
 	# I've got it set to greater than or equal to hopeful make this not a super big deal, even though it's a bit more error prone.
 	files_2d=("${CMD_OUTPUT}"/2D_maps/*)
-	if [ ${#files_2d[@]} -lt 12 ]; then
+	if [ ${#files_2d[@]} -lt $target_2d ]; then
 		OMP_NUM_THREADS="$cpus" make-CMD "$(get-gadget-snapshot "${ALL_SNAPS[-1]}")" --parallel "$cpus" --target "${CMD_OUTPUT}/2D_maps" --grid 256 --2d
 	fi
 	files_3d=("${CMD_OUTPUT}"/3D_grids/*)
-	if [ ${#files_3d[@]} -lt 180 ]; then
+	if [ ${#files_3d[@]} -lt $target_3d ]; then
 		IFS=$'\n' # Split the snapshot names into different arguments
 		OMP_NUM_THREADS="$cpus" make-CMD $(for n in "${CMD_SNAPSHOTS[@]}"; do
 			get-gadget-snapshot "${n}"
@@ -661,6 +684,58 @@ function run-disperse {
 	# Cleanup
 	find "${DISPERSE_OUTPUT}" -mindepth 1 -not -name '*.hdf5' -delete
 	mv "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}-output_file_${snap_str}.hdf5" "${DISPERSE_OUTPUT}/massgrid-disperse_G-${grid}_S-${sigma_str}_c${cut_str}-output_file_${snap_str}.hdf5"
+}
+
+ensure_exists() {
+	for f in "$@"; do
+		if ! [ -e "$f" ]; then
+			echo missing "$f"
+			result=1
+		fi
+	done
+}
+
+ensure_count() {
+	if [ $(ls $1 | wc -l) -lt "$2" ]; then
+		echo missing "$1" got $(ls $1 | wc -l) instead of "$2"
+		result=1
+	fi
+}
+
+function check() {
+	n_snap=${#ALL_SNAPS[@]}
+	snapshot="$(get-gadget-snapshot "${ALL_SNAPS[0]}")"
+	module load hdf5
+	if h5ls "${snapshot}/PartType0" &>/dev/null; then
+		n_body="n"
+	else
+		n_body="y"
+	fi
+
+	result=0
+	ensure_count "subfind/fof_subhalo_tab_*" $n_snap
+	ensure_exists sublink/tree.hdf5 sublink/tree_extended.hdf5
+	ensure_count "sublink/offsets/offsets_*.hdf5" $n_snap
+	ensure_exists sublink_gal/tree.hdf5 sublink_gal/tree_extended.hdf5
+	ensure_count "sublink_gal/offsets/offsets_*.hdf5" $n_snap
+	ensure_exists rockstar/trees/tree_0_0_0.dat rockstar/trees/locations.dat rockstar/trees/forests.list
+	ensure_count rockstar/hlists/ $(($n_snap - 20)) # This isn't an exact count since it'll skip snapshots with not enough halos
+	if [ $n_body = "n" ]; then
+		ensure_count CMD/2D_maps 12
+		ensure_count CMD/3D_grids $((3 * 5 * 12))
+		ensure_count Pk/ $((($n_snap + 1) * 5))
+	else
+		ensure_count CMD/2D_maps 1
+		ensure_count CMD/3D_grids $((3 * 5))
+		ensure_count Pk/ $(($n_snap + 1))
+	fi
+	ensure_exists DisPerSE/massgrid-disperse_G-256_S-02_c500-output_file_090.hdf5
+
+	if [ "$result" -eq 0 ]; then
+		exit 0
+	else
+		exit 1
+	fi
 }
 
 main "$@"
