@@ -91,7 +91,6 @@ function convert-snaps() {
             exit
         fi
 
-        # swift2gadget "${SOURCE_SNAP}" "${DEST_SNAP}"
         swift2gadget "${SOURCE_SNAP}" "${DEST_SNAP}"
     '
 
@@ -152,6 +151,7 @@ mapfile -t ALL_SNAPS < <(seq 0 90)
 # Note that some steps depend on previous steps, so changing one output can break later steps.
 SUBFIND_OUTPUT=./subfind/
 SUBLINK_OUTPUT=./sublink/
+SUBLINK_GAL_OUTPUT=./sublink_gal/
 ROCKSTAR_OUTPUT=./rockstar/
 CMD_OUTPUT=./CMD/
 PK_OUTPUT=./Pk/
@@ -486,59 +486,115 @@ function run-subfind() {
 }
 
 function run-sublink() {
-	if [ -e "${SUBLINK_OUTPUT}/tree.hdf5" ] && [ -e "${SUBLINK_OUTPUT}/tree_extended.hdf5" ] && [ -e "${SUBLINK_OUTPUT}/offsets/" ]; then
-		# All sublink files exist. Skipping sublink
-		return
+	# Subhalos version
+	if ! ([ -e "${SUBLINK_OUTPUT}/tree.hdf5" ] &&
+		[ -e "${SUBLINK_OUTPUT}/tree_extended.hdf5" ] &&
+		[ -e "${SUBLINK_OUTPUT}/offsets/" ]); then
+
+		# Which modules you load may vary depending on what cluster you're on.
+		module --force purge
+		module load modules/2.0-20220630
+		module load python/3.9.12
+		module load slurm
+		module load gcc/10.3.0
+		module load openmpi/4.0.7
+		module load hdf5/mpi-1.10.8
+		module load gmp/6.2.1
+		module load fftw/3.3.10
+		module load openblas/threaded-0.3.20
+		module load gsl/2.7
+
+		mkdir -p "${SUBLINK_OUTPUT}"
+
+		mkdir -p "${SUBLINK_OUTPUT}/subfind"
+		n=0
+		for i in "${ALL_SNAPS[@]}"; do
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
+			: $((n++))
+		done
+		((n--))
+
+		# Find descendants
+		"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}/sublink_first" 0 $n 0 $n Subhalos first /dev/null
+		"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}/sublink_second" 0 $n 0 $n Subhalos second /dev/null
+
+		# Compare descendants
+		"${SUBLINK_ROOT}/Descendants/compare_descendants" "${SUBLINK_OUTPUT}/sublink" 0 $n /dev/null
+
+		# Build trees
+		"${SUBLINK_ROOT}/SubhaloTrees/build_trees" "${SUBLINK_OUTPUT}/sublink" "${SUBLINK_OUTPUT}/tree" 0 $n /dev/null
+
+		# concatenate, create 'basic' and 'extended' trees, calculate offsets
+		# Depending on your system's python environment, you may need to activate your own python to run this.
+		python "${SUBLINK_ROOT}/Python/create_columns.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" 0 $n 1 0
+		python "${SUBLINK_ROOT}/Python/create_extended_trees.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" $n
+		python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_OUTPUT}/tree"
+		python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_OUTPUT}/tree_extended"
+		python "${SUBLINK_ROOT}/Python/compute_offsets.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" 0 $n
+
+		# Cleanup
+		rm -- "${SUBLINK_OUTPUT}"/sublink_*.hdf5
+		rm -r -- "${SUBLINK_OUTPUT}/columns/"
+		rm -- "${SUBLINK_OUTPUT}"/tree.*.hdf5
+		rm -- "${SUBLINK_OUTPUT}"/tree_extended.*.hdf5
+		rm -r -- "${SUBLINK_OUTPUT}/subfind"
 	fi
 
-	# Which modules you load may vary depending on what cluster you're on.
-	module --force purge
-	module load modules/2.0-20220630
-	module load python/3.9.12
-	module load slurm
-	module load gcc/10.3.0
-	module load openmpi/4.0.7
-	module load hdf5/mpi-1.10.8
-	module load gmp/6.2.1
-	module load fftw/3.3.10
-	module load openblas/threaded-0.3.20
-	module load gsl/2.7
+	# Subhalos version
+	if ! ([ -e "${SUBLINK_GAL_OUTPUT}/tree.hdf5" ] &&
+		[ -e "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5" ] &&
+		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]); then
 
-	mkdir -p "${SUBLINK_OUTPUT}"
+		# Which modules you load may vary depending on what cluster you're on.
+		module --force purge
+		module load modules/2.0-20220630
+		module load python/3.9.12
+		module load slurm
+		module load gcc/10.3.0
+		module load openmpi/4.0.7
+		module load hdf5/mpi-1.10.8
+		module load gmp/6.2.1
+		module load fftw/3.3.10
+		module load openblas/threaded-0.3.20
+		module load gsl/2.7
 
-	mkdir -p "${SUBLINK_OUTPUT}/subfind"
-	n=0
-	for i in "${ALL_SNAPS[@]}"; do
-		ln -sfr "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
-		ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
-		: $((n++))
-	done
-	((n--))
+		mkdir -p "${SUBLINK_GAL_OUTPUT}"
 
-	# Find descendants
-	"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}/sublink_first" 0 $n 0 $n Subhalos first /dev/null
-	"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}/sublink_second" 0 $n 0 $n Subhalos second /dev/null
+		mkdir -p "${SUBLINK_GAL_OUTPUT}/subfind"
+		n=0
+		for i in "${ALL_SNAPS[@]}"; do
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
+			: $((n++))
+		done
+		((n--))
 
-	# Compare descendants
-	"${SUBLINK_ROOT}/Descendants/compare_descendants" "${SUBLINK_OUTPUT}/sublink" 0 $n /dev/null
+		# Find descendants
+		"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_GAL_OUTPUT}/subfind" "${SUBLINK_GAL_OUTPUT}/sublink_first" 0 $n 0 $n Galaxies first /dev/null
+		"${SUBLINK_ROOT}/Descendants/find_descendants" "${SUBLINK_GAL_OUTPUT}/subfind" "${SUBLINK_GAL_OUTPUT}/sublink_second" 0 $n 0 $n Galaxies second /dev/null
 
-	# Build trees
-	"${SUBLINK_ROOT}/SubhaloTrees/build_trees" "${SUBLINK_OUTPUT}/sublink" "${SUBLINK_OUTPUT}/tree" 0 $n /dev/null
+		# Compare descendants
+		"${SUBLINK_ROOT}/Descendants/compare_descendants" "${SUBLINK_GAL_OUTPUT}/sublink" 0 $n /dev/null
 
-	# concatenate, create 'basic' and 'extended' trees, calculate offsets
-	# Depending on your system's python environment, you may need to activate your own python to run this.
-	python "${SUBLINK_ROOT}/Python/create_columns.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" 0 $n 1 0
-	python "${SUBLINK_ROOT}/Python/create_extended_trees.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" $n
-	python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_OUTPUT}/tree"
-	python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_OUTPUT}/tree_extended"
-	python "${SUBLINK_ROOT}/Python/compute_offsets.py" "${SUBLINK_OUTPUT}/subfind" "${SUBLINK_OUTPUT}" 0 $n
+		# Build trees
+		"${SUBLINK_ROOT}/SubhaloTrees/build_trees" "${SUBLINK_GAL_OUTPUT}/sublink" "${SUBLINK_GAL_OUTPUT}/tree" 0 $n /dev/null
 
-	# Cleanup
-	rm -- "${SUBLINK_OUTPUT}"/sublink_*.hdf5
-	rm -r -- "${SUBLINK_OUTPUT}/columns/"
-	rm -- "${SUBLINK_OUTPUT}"/tree.*.hdf5
-	rm -- "${SUBLINK_OUTPUT}"/tree_extended.*.hdf5
-	rm -r -- "${SUBLINK_OUTPUT}/subfind"
+		# concatenate, create 'basic' and 'extended' trees, calculate offsets
+		# Depending on your system's python environment, you may need to activate your own python to run this.
+		python "${SUBLINK_ROOT}/Python/create_columns.py" "${SUBLINK_GAL_OUTPUT}/subfind" "${SUBLINK_GAL_OUTPUT}" 0 $n 1 0
+		python "${SUBLINK_ROOT}/Python/create_extended_trees.py" "${SUBLINK_GAL_OUTPUT}/subfind" "${SUBLINK_GAL_OUTPUT}" $n
+		python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_GAL_OUTPUT}/tree"
+		python "${SUBLINK_ROOT}/Python/concatenate_trees.py" "${SUBLINK_GAL_OUTPUT}/tree_extended"
+		python "${SUBLINK_ROOT}/Python/compute_offsets.py" "${SUBLINK_GAL_OUTPUT}/subfind" "${SUBLINK_GAL_OUTPUT}" 0 $n
+
+		# Cleanup
+		rm -- "${SUBLINK_GAL_OUTPUT}"/sublink_*.hdf5
+		rm -r -- "${SUBLINK_GAL_OUTPUT}/columns/"
+		rm -- "${SUBLINK_GAL_OUTPUT}"/tree.*.hdf5
+		rm -- "${SUBLINK_GAL_OUTPUT}"/tree_extended.*.hdf5
+		rm -r -- "${SUBLINK_GAL_OUTPUT}/subfind"
+	fi
 	rm -- "${SUBFIND_OUTPUT}"/snap-groupordered-storeids_*.hdf5
 }
 
