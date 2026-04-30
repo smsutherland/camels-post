@@ -12,6 +12,7 @@ dependencies = [
     "h5py",
     "scipy",
     "Pylians",
+    "joblib",
     "voxelize@git+https://github.com/smsutherland/voxelize",
     "pygadgetreader@git+https://github.com/dnarayanan/pygadgetreader",
 ]
