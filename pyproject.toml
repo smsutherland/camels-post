@@ -13,6 +13,7 @@ dependencies = [
     "scipy",
     "Pylians",
     "joblib",
+    "astropy",
     "voxelize@git+https://github.com/smsutherland/voxelize",
     "pygadgetreader@git+https://github.com/dnarayanan/pygadgetreader",
 ]
