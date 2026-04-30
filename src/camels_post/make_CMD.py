@@ -288,7 +288,9 @@ def make_images(
                 masked_data.gas_iron,
             ),
         }
-    if masked_data.has_parts[1]:
+    if masked_data.has_parts[1] and masked_data.has_parts.sum() > 1:
+        # Only include this if we're in a hydro run.
+        # nbody runs get just m_tot
         fields |= {
             "Mcdm": (
                 masked_data.dm_position,
@@ -363,7 +365,7 @@ def make_images(
             )
             results[k][zero_mass] = 0.0
 
-    if masked_data.has_parts[1]:
+    if masked_data.has_parts[1] and masked_data.has_parts.sum() > 1:
         for k in ["Vcdm"]:
             zero_mass = results["Mcdm"] == 0.0
             np.divide(
