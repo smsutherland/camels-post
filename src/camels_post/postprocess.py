@@ -52,9 +52,16 @@ def main():
 
     target.mkdir(exist_ok=True)
 
-    shutil.copy(
-        Path(__file__).parent / "presets" / (preset + ".sh"), target / "post_process.sh"
-    )
+    with open(Path(__file__).parent / "post_process.sh") as f:
+        post_process_file = f.read()
+
+    with open(Path(__file__).parent / "presets" / (preset + ".sh")) as f:
+        preset = f.read()
+
+    post_process_file = post_process_file.replace("PRESET_OPTIONS", preset)
+
+    with open(target / "post_process.sh", "w") as f:
+        f.write(post_process_file)
     shutil.copy(Path(__file__).parent / "check.sh", target / "check.sh")
 
     post_process_path = target / "post_process.sh"
