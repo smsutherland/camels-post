@@ -133,7 +133,9 @@ the given particle type in kpc/h, either the comoving length, or the maximum
 physical length. Parameter 1 is the numerical particle type (0, 1, 4, 5).
 Parameter 2 is either "comoving" or "physical". 
 
-The following variables are also defined.
+The following variables are also defined. Remember that this config is run as
+part of a larger bash script, so these variables can have values dynamically
+determined at runtime!
 
 #### *_OUTPUT
 
@@ -202,3 +204,4 @@ no such file exists, turn this option off by setting it to "no".
 - Combine-IC should make a virtual snapshot if combining hdf5 snapshots.
 - Rename combine-IC to combine-file.
 - Try to reconstruct groupordered snapshots based on subfind output.
+- Option to control which steps run.

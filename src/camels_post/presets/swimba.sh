@@ -56,7 +56,6 @@ function cleanup() {
 # Note the fact / h!!!
 # For SWIFT at least, I've got to also extract h from the parameter file and perform that conversion.
 # At the very least, it should support particle types 0-4 since those are expected to be in the Subfind parameter file.
-# TODO: CHECK SOFTENING UNITS FOR SUBFIND
 function get-softening() {
 	h=$(sed -ne 's/^\s*h: //p' params.yml)
 	l=$(
