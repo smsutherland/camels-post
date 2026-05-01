@@ -1,7 +1,7 @@
 camels-post
 -----------
 `camels-post` is a all-in-one package for post-processing simulations for the
-[CAMELS project](camels.readthedocs.io). The package is designed to work out of
+[CAMELS project](https://camels.readthedocs.io). The package is designed to work out of
 the box, though it has currently only been tested on the Flatiron Institute's
 rusty and popeye clusters. The package supports both hydrodynamic and N-body
 simulations. If you encounter any problems using `camels-post`, please file an
@@ -9,9 +9,12 @@ issue on github. If you use `camels-post` to generate data for a publication,
 I ask that you please note this in an acknowledgments section.
 
 ### Quick Navigation
+  * [Data Products](#data_products)
   * [Installation](#installation)
   * [Usage](#usage)
   * [Configuration](#configuration)
+
+### Data Products
 
 ### Installation
 `camels-post` depends on [Eigen](https://libeigen.gitlab.io/) (Through the
@@ -116,7 +119,7 @@ file.
 Print the path to a gadget hdf5 snapshot. Num ($1) determines the snapshot
 number to print (see [ALL_SNAPS](#all_snaps)).
 
-#### cleanup
+#### cleanup()
 
 This function is called after the pipeline is successfully completed. If you
 created any temporary files (such as in [convert-snaps](#convert-snaps)), you
@@ -134,17 +137,53 @@ The following variables are also defined.
 
 #### *_OUTPUT
 
+The various *_OUTPUT variables determine where to put the outputs for each step
+of the process. Currently, the steps to specify outputs for are SUBFIND,
+SUBLINK, SUBLINK_GAL, ROCKSTAR, CMD, PK, and DISPERSE.
+
 #### *_ROOT
+
+Some of the data products come from tools provided in this package (CMD, power
+spectra). Others depend on external tools. `camels-post` uses the *_ROOT
+variables to know where these tools are installed. Currently, the tools to
+specify roots for are AREPO (subfind), SUBLINK, ROCKSTAR, CONSISTENT_TREE,
+DISPERSE. Note that Sublink has multiple versions (multi vs single file
+snapshots, 4 vs 8 byte particle IDs). Other parts of the pipeline require
+single file snapshots ([so convert as necessary](#convert_snaps)), but make sure
+to use the correct ID length.
 
 #### *_PTYPES
 
+This is a WIP feature currently. BARYON_PTYPES should be an array with the
+particle types which are baryons. For a hydrodynamic run this should be 0, 4,
+and 5 for compatability with all the tools. For dark matter only runs, this
+array should be empty. DM_PTYPES should be an array of just 1. This option will
+eventually be removed.
+
 #### CMD_SNAPSHOTS
+
+In the CAMELS Multifield Dataset, we make 3D grids for z = 0, 0.5, 1, 1.5, and
+2. This should be an array with the snapshot numbers corresponding with these
+redshifts.
 
 #### CLEAN_GADGET_SNAPS
 
-#### CONVERT_SNAPS
+When `--force` is passed to the post-processing script, it will remove all its
+existing data products and start over from scratch. If this option is set to
+"yes", the snapshots will be removed as well. **Only set this option to "yes" if
+your snapshots are converted. If [get-gadget-snapshot](#get_gadget_snapshot)
+points to your original data products, turn this option off.**
+
+#### CONVERT_SNAPSHOTS
+
+If set to "yes", the pipeline will call [convert-snaps](#convert_snaps) at the
+start.
 
 #### WITH_COSMOASTROSEED
+
+DisPerSE outputs include the parameters that go in to a given CAMELS run. The
+parameters are given by the CosmoAstroSeed*.txt file in the parent directory. If
+no such file exists, turn this option off by setting it to "no".
 
 ### To-Dos
 - Make the preset list populate automatically based on the contents of the
@@ -152,6 +191,14 @@ The following variables are also defined.
 - Move swift2gadget to this package
 - 50Mpc
 - Allow snapshots to not all be in the form path/to/snap_<snapNumber>.hdf5
-- either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
+- Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
   everything being like SIMBA. Currently the pipeline breaks if, for example,
   a snapshot has background DM type 2.
+- restart_job.sh
+- Verify configuration validity at start of script.
+- Automatically determine CMD snapshots from redshifts in the snapshots.
+- Document snapshot format minimum requirements.
+- Improve my tooling to use multi-file snapshots.
+- Combine-IC should make a virtual snapshot if combining hdf5 snapshots.
+- Rename combine-IC to combine-file.
+- Try to reconstruct groupordered snapshots based on subfind output.
