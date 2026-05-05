@@ -339,7 +339,7 @@ function run-subfind() {
 	for i in "${ALL_SNAPS[@]}"; do
 		# I've seen situations where subfind can spuriously fail, so we end up missing one random catalog.
 		# I check each catalog individually rather than checking for the final one so that if one is randomly missing, it can still be recovered without restarting everything.
-		if [ -e "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" ]; then
+		if [ -e "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" ]; then
 			continue
 		fi
 		ln -sf "$(realpath "$(get-gadget-snapshot "$i")" --relative-to="${SUBFIND_OUTPUT}")" "$(printf "${SUBFIND_OUTPUT}/snap_%03d.hdf5" "$i")"
@@ -349,7 +349,7 @@ function run-subfind() {
 		unset SLURM_JOBID
 		mpirun --bind-to none -N "$cpus" "${AREPO_ROOT}/Arepo" ./arepo_subfind_param.txt 3 "$i" 2>&1 | tee "subfind_${i}.log"
 		popd
-		# srun --ntasks=${cpus} --cpus-per-task=1 --cpu_bind=cores --kill-on-bad-exit=1 $AREPO_ROOT/Arepo ./arepo_subfind_param.txt 3 $i 2>&1 | tee "subfind_${i}.log"
+		mv "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")"
 	done
 }
 
@@ -377,7 +377,7 @@ function run-sublink() {
 		mkdir -p "${SUBLINK_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
-			ln -sfr "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
 			: $((n++))
 		done
@@ -432,7 +432,7 @@ function run-sublink() {
 		mkdir -p "${SUBLINK_GAL_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
-			ln -sfr "$(printf "${SUBFIND_OUTPUT}/fof_subhalo_tab_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
 			: $((n++))
 		done
@@ -676,9 +676,9 @@ function run-disperse {
 	"${DISPERSE_ROOT}/skelconv" "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}.up.NDskl" -cosmo "$Om" "$Ol" "$Ok" "$h" "$w" -breakdown -smooth 1 -to NDskl_ascii -outName "masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}" -outDir "${DISPERSE_OUTPUT}"
 	if [ "${WITH_COSMOASTROSEED}" = "yes" ]; then
 		# disperse2hdf5 is part of postprocessing package
-		disperse2hdf5 "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}.BRK.S001.a.NDskl" "${SUBFIND_OUTPUT}/fof_subhalo_tab_${snap_str}.hdf5" ../CosmoAstroSeed*.txt --grid $grid --target "${DISPERSE_OUTPUT}"
+		disperse2hdf5 "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}.BRK.S001.a.NDskl" "${SUBFIND_OUTPUT}/groups_${snap_str}.hdf5" ../CosmoAstroSeed*.txt --grid $grid --target "${DISPERSE_OUTPUT}"
 	else
-		disperse2hdf5 "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}.BRK.S001.a.NDskl" "${SUBFIND_OUTPUT}/fof_subhalo_tab_${snap_str}.hdf5" --grid $grid --target "${DISPERSE_OUTPUT}"
+		disperse2hdf5 "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}.BRK.S001.a.NDskl" "${SUBFIND_OUTPUT}/groups_${snap_str}.hdf5" --grid $grid --target "${DISPERSE_OUTPUT}"
 	fi
 
 	# Cleanup
@@ -713,7 +713,7 @@ function check() {
 	fi
 
 	result=0
-	ensure_count "subfind/fof_subhalo_tab_*" $n_snap
+	ensure_count "subfind/groups_*" $n_snap
 	ensure_exists sublink/tree.hdf5 sublink/tree_extended.hdf5
 	ensure_count "sublink/offsets/offsets_*.hdf5" $n_snap
 	ensure_exists sublink_gal/tree.hdf5 sublink_gal/tree_extended.hdf5
