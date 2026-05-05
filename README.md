@@ -156,11 +156,11 @@ should delete them here.
 
 #### get-softening(ptype, physical/comoving)
 
-Subfind depends on the gravitational softening parameters matching what the
-simulation was run with. This function should print the softening length for
-the given particle type in kpc/h, either the comoving length, or the maximum
-physical length. Parameter 1 is the numerical particle type (0, 1, 4, 5).
-Parameter 2 is either "comoving" or "physical". 
+[Subfind](#subfind-halosubhalo-catalogs) depends on the gravitational softening
+parameters matching what the simulation was run with. This function should print
+the softening length for the given particle type in kpc/h, either the comoving
+length, or the maximum physical length. Parameter 1 is the numerical particle
+type (0, 1, 4, 5). Parameter 2 is either "comoving" or "physical".
 
 The following variables are also defined. Remember that this config is run as
 part of a larger bash script, so these variables can have values dynamically
@@ -171,7 +171,7 @@ determined at runtime!
 This parameter should be an array containing all the snap numbers your
 simulation produces. The numbers do not need to be zero-padded, but not
 zero-padding them will mean you need to handle any zero-padding in
-[get-gadget-snapshot](#get-gadget-snapshot)
+[get-gadget-snapshot](#get-gadget-snapshotnum)
 
 #### *_OUTPUT
 
@@ -209,7 +209,7 @@ redshifts.
 When `--force` is passed to the post-processing script, it will remove all its
 existing data products and start over from scratch. If this option is set to
 "yes", the snapshots will be removed as well. **Only set this option to "yes" if
-your snapshots are converted. If [get-gadget-snapshot](#get-gadget-snapshot)
+your snapshots are converted. If [get-gadget-snapshot](#get-gadget-snapshotnum)
 points to your original data products, turn this option off.**
 
 #### CONVERT_SNAPSHOTS
