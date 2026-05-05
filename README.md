@@ -166,6 +166,13 @@ The following variables are also defined. Remember that this config is run as
 part of a larger bash script, so these variables can have values dynamically
 determined at runtime!
 
+#### ALL_SNAPS
+
+This parameter should be an array containing all the snap numbers your
+simulation produces. The numbers do not need to be zero-padded, but not
+zero-padding them will mean you need to handle any zero-padding in
+[get-gadget-snapshot](#get-gadget-snapshot)
+
 #### *_OUTPUT
 
 The various *_OUTPUT variables determine where to put the outputs for each step
