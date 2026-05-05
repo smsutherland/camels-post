@@ -169,9 +169,8 @@ determined at runtime!
 #### ALL_SNAPS
 
 This parameter should be an array containing all the snap numbers your
-simulation produces. The numbers do not need to be zero-padded, but not
-zero-padding them will mean you need to handle any zero-padding in
-[get-gadget-snapshot](#get-gadget-snapshotnum)
+simulation produces. The numbers need to not be zero-padded, otherwise printf
+will interpret them as octal numbers.
 
 #### *_OUTPUT
 
@@ -246,3 +245,4 @@ no such file exists, turn this option off by setting it to "no".
 - Make modules more generalisable.
 - specify MPI dependency
 - Determine minimum Arepo build
+- Allow for zero-padded ALL_SNAPS
