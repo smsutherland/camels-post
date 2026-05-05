@@ -27,18 +27,10 @@ halos and subfind subhalos. A good description of the data can be found on the
 [IllustrisTNG
 website](https://www.tng-project.org/data/docs/specifications/#sec2). Arepo is
 not shipped with this package. You must provide your own copy, and point to it's
-home directory via the [AREPO_ROOT](#_root) config parameter. Arepo must be
-compiled with at least the following settings enabled:
-- NTYPES=6
-- PERIODIC
-- FOF
-- FOF_PRIMARY_LINK_TYPES=2
-- FOF_SECONDARY_LINK_TYPES=1+16+32
-- FOF_STOREIDS
-- GROUPORDERED_SNAPS
-- SUBFIND
-- SAVE_HSML_IN_SNAPSHOT
-- SUBFIND_CALC_MORE
+home directory via the [AREPO_ROOT](#_root) config parameter. Based on my own
+testing, the public version of Arepo can kinda work, but doesn't produce all the
+expected outputs in its files. If you have access to it, I recommend using the
+build of Arepo used by the CAMELS project for the IllustrisTNG suite.
 
 #### Sublink merger trees
 
@@ -54,7 +46,8 @@ compiled with at least the following settings enabled:
 `camels-post` depends on [Eigen](https://libeigen.gitlab.io/) (Through the
 [voxelize](https://github.com/leanderthiele/voxelize) library).
 It also requires a python installation with development headers Cython can use.
-`camels-post` is designed for use with
+`camels-post` also requires an MPI installation in order to run some parts of
+the pipeline. `camels-post` is designed for use with
 [disBatch](https://github.com/flatironinstitute/disBatch), but it is not
 strictly required.
 
@@ -75,6 +68,8 @@ Or via pipx:
 ```
 pipx install 'git+https://github.com/smsutherland/camels-post'
 ```
+
+#### A note on modules
 
 ### Usage
 The main tool you will interact with is called `camels-post`.
