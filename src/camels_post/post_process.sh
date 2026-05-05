@@ -412,7 +412,8 @@ function run-sublink() {
 	# Galaxies version
 	if ! ([ -e "${SUBLINK_GAL_OUTPUT}/tree.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5" ] &&
-		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]); then
+		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]) &&
+        h5ls "$(get-gadget-snapshot "${ALL_SNAPS[0]}")/PartType0" &>/dev/null; then
 
 		# Which modules you load may vary depending on what cluster you're on.
 		module --force purge
