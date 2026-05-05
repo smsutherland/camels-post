@@ -27,7 +27,7 @@ function cleanup() {
 	:
 }
 
-# Get softening in Mpc / h
+# Get softening in kpc / h
 # This is necessary for subfind and rockstar, since subhalo finding depends on softening lengths.
 # $1 is a particle type
 # $2 is either "comoving" or "physical"
@@ -35,9 +35,7 @@ function cleanup() {
 # then this can just ignore the arguments and return that one value.
 # This implementation just extracts the corresponding values from the SWIFT parameter file.
 # Note the fact / h!!!
-# For SWIFT at least, I've got to also extract h from the parameter file and perform that conversion.
 # At the very least, it should support particle types 0-4 since those are expected to be in the Subfind parameter file.
-# TODO: CHECK SOFTENING UNITS FOR SUBFIND
 function get-softening() {
 	case $1 in
 	0)

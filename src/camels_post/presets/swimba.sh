@@ -46,7 +46,7 @@ function cleanup() {
 	rm -r "/scratch/${SIM_ROOT}/"
 }
 
-# Get softening in Mpc / h
+# Get softening in kpc / h
 # This is necessary for subfind and rockstar, since subhalo finding depends on softening lengths.
 # $1 is a particle type
 # $2 is either "comoving" or "physical"
