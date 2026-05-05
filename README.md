@@ -187,7 +187,7 @@ variables to know where these tools are installed. Currently, the tools to
 specify roots for are AREPO (subfind), SUBLINK, ROCKSTAR, CONSISTENT_TREE,
 DISPERSE. Note that Sublink has multiple versions (multi vs single file
 snapshots, 4 vs 8 byte particle IDs). Other parts of the pipeline require
-single file snapshots ([so convert as necessary](#convert_snaps)), but make sure
+single file snapshots ([so convert as necessary](#convert-snaps)), but make sure
 to use the correct ID length.
 
 #### *_PTYPES
@@ -209,12 +209,12 @@ redshifts.
 When `--force` is passed to the post-processing script, it will remove all its
 existing data products and start over from scratch. If this option is set to
 "yes", the snapshots will be removed as well. **Only set this option to "yes" if
-your snapshots are converted. If [get-gadget-snapshot](#get_gadget_snapshot)
+your snapshots are converted. If [get-gadget-snapshot](#get-gadget-snapshot)
 points to your original data products, turn this option off.**
 
 #### CONVERT_SNAPSHOTS
 
-If set to "yes", the pipeline will call [convert-snaps](#convert_snaps) at the
+If set to "yes", the pipeline will call [convert-snaps](#convert-snaps) at the
 start.
 
 #### WITH_COSMOASTROSEED
