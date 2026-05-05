@@ -1,12 +1,12 @@
 camels-post
 -----------
 `camels-post` is a all-in-one package for post-processing simulations for the
-[CAMELS project](https://camels.readthedocs.io). The package is designed to work out of
-the box, though it has currently only been tested on the Flatiron Institute's
-rusty and popeye clusters. The package supports both hydrodynamic and N-body
-simulations. If you encounter any problems using `camels-post`, please file an
-issue on github. If you use `camels-post` to generate data for a publication,
-I ask that you please note this in an acknowledgments section.
+[CAMELS project](https://camels.readthedocs.io). The package is designed to work
+out of the box, though it has currently only been tested on the Flatiron
+Institute's rusty and popeye clusters. The package supports both hydrodynamic
+and N-body simulations. If you encounter any problems using `camels-post`,
+please file an issue on github. If you use `camels-post` to generate data for a
+publication, I ask that you please note this in an acknowledgments section.
 
 ### Quick Navigation
   * [Data Products](#data_products)
@@ -15,6 +15,40 @@ I ask that you please note this in an acknowledgments section.
   * [Configuration](#configuration)
 
 ### Data Products
+
+#### Subfind halo/subhalo catalogs
+
+The subfind algorithm, implemented in the
+[Arepo](https://gitlab.mpcdf.mpg.de/vrs/arepo) simulation code, is used to
+identify substructure within snapshots. Outputs are named
+`groups_<snap_num>.hdf5` and are put in the directory specified by
+[SUBFIND_OUTPUT](#_output). Each hdf5 output contains both friends-of-friends
+halos and subfind subhalos. A good description of the data can be found on the
+[IllustrisTNG
+website](https://www.tng-project.org/data/docs/specifications/#sec2). Arepo is
+not shipped with this package. You must provide your own copy, and point to it's
+home directory via the [AREPO_ROOT](#_root) config parameter. Arepo must be
+compiled with at least the following settings enabled:
+- NTYPES=6
+- PERIODIC
+- FOF
+- FOF_PRIMARY_LINK_TYPES=2
+- FOF_SECONDARY_LINK_TYPES=1+16+32
+- FOF_STOREIDS
+- GROUPORDERED_SNAPS
+- SUBFIND
+- SAVE_HSML_IN_SNAPSHOT
+- SUBFIND_CALC_MORE
+
+#### Sublink merger trees
+
+#### Rockstar + Consistent Trees merger trees
+
+#### DisPerSE cosmic web filaments
+
+#### Camels Multifield Dataset (CMD) maps and grids
+
+#### Power spectra
 
 ### Installation
 `camels-post` depends on [Eigen](https://libeigen.gitlab.io/) (Through the
@@ -205,3 +239,8 @@ no such file exists, turn this option off by setting it to "no".
 - Rename combine-IC to combine-file.
 - Try to reconstruct groupordered snapshots based on subfind output.
 - Option to control which steps run.
+- Rename outputs to better match names in CAMELS.
+- Check how the subfind differ between our arepo and the public version.
+- Make modules more generalisable.
+- specify MPI dependency
+- Determine minimum Arepo build
