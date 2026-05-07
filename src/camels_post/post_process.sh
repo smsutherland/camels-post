@@ -193,7 +193,7 @@ function run-subfind() {
 		EOF
 	)
 
-	mkdir -p "$SUBFIND_OUTPUT"
+	mkdir -p -- "$SUBFIND_OUTPUT"
 	cat >"${SUBFIND_OUTPUT}/arepo_subfind_param.txt" <<-EOF
 		InitCondFile                                      /dev/null
 		Omega0                                            ${Om}
@@ -372,9 +372,9 @@ function run-sublink() {
 		module load openblas/threaded-0.3.20
 		module load gsl/2.7
 
-		mkdir -p "${SUBLINK_OUTPUT}"
+		mkdir -p -- "${SUBLINK_OUTPUT}"
 
-		mkdir -p "${SUBLINK_OUTPUT}/subfind"
+		mkdir -p -- "${SUBLINK_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
@@ -413,7 +413,7 @@ function run-sublink() {
 	if ! ([ -e "${SUBLINK_GAL_OUTPUT}/tree.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]) &&
-        h5ls "$(get-gadget-snapshot "${ALL_SNAPS[0]}")/PartType0" &>/dev/null; then
+		h5ls "$(get-gadget-snapshot "${ALL_SNAPS[0]}")/PartType0" &>/dev/null; then
 
 		# Which modules you load may vary depending on what cluster you're on.
 		module --force purge
@@ -428,9 +428,9 @@ function run-sublink() {
 		module load openblas/threaded-0.3.20
 		module load gsl/2.7
 
-		mkdir -p "${SUBLINK_GAL_OUTPUT}"
+		mkdir -p -- "${SUBLINK_GAL_OUTPUT}"
 
-		mkdir -p "${SUBLINK_GAL_OUTPUT}/subfind"
+		mkdir -p -- "${SUBLINK_GAL_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
@@ -475,7 +475,7 @@ function run-rockstar() {
 	module --force purge
 	module load modules/2.0-20220630
 	module load hdf5/1.10.8
-	mkdir -p "${ROCKSTAR_OUTPUT}"
+	mkdir -p -- "${ROCKSTAR_OUTPUT}"
 	# This could probably be done a bit cleaner with a quick python line, but whatever.
 	box_size=$(($(h5dump --attribute=/Header/BoxSize --noindex "$(get-gadget-snapshot "${ALL_SNAPS[0]}")" | sed -n "6p") / 1000))
 
@@ -596,16 +596,12 @@ function run-cmd() {
 		target_3d=15
 	fi
 
-	mkdir -p "${CMD_OUTPUT}/2D_maps"
-	mkdir -p "${CMD_OUTPUT}/3D_grids"
-	# Currently I've got 12 fields I'm maping for the CMD. Should that number change, it should change here as well.
-	# I've got it set to greater than or equal to hopeful make this not a super big deal, even though it's a bit more error prone.
-	files_2d=("${CMD_OUTPUT}"/2D_maps/*)
-	if [ ${#files_2d[@]} -lt $target_2d ]; then
+	mkdir -p -- "${CMD_OUTPUT}/2D_maps"
+	mkdir -p -- "${CMD_OUTPUT}/3D_grids"
+	if [ "$(ls -- "${CMD_OUTPUT}"/2D_maps/ | wc -l)" -lt "$target_2d" ]; then
 		OMP_NUM_THREADS="$cpus" make-CMD "$(get-gadget-snapshot "${ALL_SNAPS[-1]}")" --parallel "$cpus" --target "${CMD_OUTPUT}/2D_maps" --grid 256 --2d
 	fi
-	files_3d=("${CMD_OUTPUT}"/3D_grids/*)
-	if [ ${#files_3d[@]} -lt $target_3d ]; then
+	if [ "$(ls -- "${CMD_OUTPUT}"/3D_grids/ | wc -l)" -lt "$target_3d" ]; then
 		IFS=$'\n' # Split the snapshot names into different arguments
 		OMP_NUM_THREADS="$cpus" make-CMD $(for n in "${CMD_SNAPSHOTS[@]}"; do
 			get-gadget-snapshot "${n}"
@@ -624,7 +620,7 @@ function run-cmd() {
 }
 
 function run-Pk() {
-	mkdir -p "${PK_OUTPUT}"
+	mkdir -p -- "${PK_OUTPUT}"
 	pk_files=("${PK_OUTPUT}"/*)
 	if [ ${#pk_files[@]} -ge 460 ]; then
 		return
@@ -653,7 +649,7 @@ function run-disperse {
 		return
 	fi
 
-	mkdir -p "${DISPERSE_OUTPUT}"
+	mkdir -p -- "${DISPERSE_OUTPUT}"
 
 	module --force purge
 	module load modules/2.4-20250724
