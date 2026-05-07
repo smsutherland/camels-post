@@ -246,3 +246,5 @@ no such file exists, turn this option off by setting it to "no".
 - specify MPI dependency
 - Determine minimum Arepo build
 - Allow for zero-padded ALL_SNAPS
+- Differentiate subfind for nbody and for hydro in documentation (and for
+  swimba_DM)
