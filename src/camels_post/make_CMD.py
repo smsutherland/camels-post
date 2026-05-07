@@ -469,7 +469,9 @@ def load_snap(snap: Path, parallelism: int) -> SnapshotData:
             if "Masses" in f["PartType1"]:
                 dm_mass = f["PartType1/Masses"][:] * 1e10  # Msun / h
             else:
-                dm_mass = np.full_like(dm_radius, f["Header"].attrs["MassTable"][1])
+                dm_mass = np.full_like(
+                    dm_radius, f["Header"].attrs["MassTable"][1] * 1e10
+                )  # Msun / h
         else:
             dm_position = np.empty((0, 3), dtype=np.float32)
             dm_velocity = np.empty((0, 3), dtype=np.float32)
