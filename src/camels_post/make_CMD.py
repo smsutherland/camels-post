@@ -142,7 +142,7 @@ def main():
 
             for field, path in paths.items():
                 if field in full_results:
-                    np.save(path, full_results[field])
+                    np.save(path, full_results[field].astype(np.float32))
 
     if run_3d or not run_2d:
         os.environ["OMP_NUM_THREADS"] = str(parallelism)
@@ -181,9 +181,7 @@ def main():
 
             for field, path in paths.items():
                 if field in result:
-                    np.save(path, result[field])
-
-    # shutil.rmtree(target_dir / "mmap")
+                    np.save(path, result[field].astype(np.float32))
 
 
 def make_images(
