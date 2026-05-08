@@ -99,9 +99,9 @@ def compute_Pk(
 
             coords_dset: h5py.Dataset = group["Coordinates"]
             num_in_group: int = coords_dset.shape[0]
-            assert (
-                index + num_in_group <= num_particles
-            ), f"Malformed snapshot! {snapshot.filename}"
+            assert index + num_in_group <= num_particles, (
+                f"Malformed snapshot! {snapshot.filename}"
+            )
             coords_dset.read_direct(
                 coordinates,
                 np.s_[0:num_in_group, 0:3],
