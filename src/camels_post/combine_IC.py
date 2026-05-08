@@ -66,17 +66,12 @@ def copy_ic(source: str, destination: str):
             ]
 
         hdf5_kwargs = dict(
-            chunks=True,
-            compression="gzip",
-            fletcher32=True,
-            shuffle=True
+            chunks=True, compression="gzip", fletcher32=True, shuffle=True
         )
 
         for gadget_name, gadget_type, hdf5_name in fields:
             data = pygadgetreader.readsnap(source, gadget_name, gadget_type)
-            f.create_dataset(
-                hdf5_name, data=data, **hdf5_kwargs
-            )
+            f.create_dataset(hdf5_name, data=data, **hdf5_kwargs)
 
         if original_header["ndm"] > 0:
             # Special case of DM masses
@@ -84,12 +79,10 @@ def copy_ic(source: str, destination: str):
                 dm_mass = pygadgetreader.readsnap(source, "mass", "dm")
             except KeyError:
                 # masses don't exist. Use value from mass_table
-                dm_mass = np.full(original_header["ndm"], original_header["massTable"][1])
-            f.create_dataset(
-                "PartType1/Masses",
-                data=dm_mass,
-                **hdf5_kwargs
-            )
+                dm_mass = np.full(
+                    original_header["ndm"], original_header["massTable"][1]
+                )
+            f.create_dataset("PartType1/Masses", data=dm_mass, **hdf5_kwargs)
 
         if original_header["ngas"] > 0:
             # Set smoothing lengths to mean inter-particle separation
@@ -97,7 +90,7 @@ def copy_ic(source: str, destination: str):
             f.create_dataset(
                 "PartType0/SmoothingLength",
                 data=hsm * np.ones(original_header["ngas"]),
-                **hdf5_kwargs
+                **hdf5_kwargs,
             )
 
             # Write internal energies
@@ -113,14 +106,14 @@ def copy_ic(source: str, destination: str):
             unitv = 1e5
             adec = 1.0 / (160.0 * (Omega_b * h * h / 0.022) ** (2.0 / 5.0))
             Tini = Tcmb0 / a if a < adec else Tcmb0 / a / a * adec
-            mu = 4.0 / (8.0 - 5.0 * YHe) if Tini > 1e4 else 4.0 / (1.0 + 3.0 * (1.0 - YHe))
+            mu = (
+                4.0 / (8.0 - 5.0 * YHe)
+                if Tini > 1e4
+                else 4.0 / (1.0 + 3.0 * (1.0 - YHe))
+            )
             energy = 1.3806e-16 / 1.6726e-24 * Tini * npol / mu / unitv / unitv
             energies = np.full(original_header["ngas"], energy)
-            f.create_dataset(
-                "PartType0/InternalEnergy",
-                data=energies,
-                **hdf5_kwargs
-            )
+            f.create_dataset("PartType0/InternalEnergy", data=energies, **hdf5_kwargs)
 
         # Make sure all particles are in the box.
         # Sometimes the conversion results in particles just barely outside the box.
