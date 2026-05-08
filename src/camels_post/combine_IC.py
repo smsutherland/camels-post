@@ -3,9 +3,9 @@ import math
 import sys
 
 import h5py
+import hdf5plugin as _  # noqa
 import numpy as np
 import pygadgetreader
-import hdf5plugin
 
 
 def main():

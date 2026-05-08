@@ -1,13 +1,14 @@
 import argparse
-import numpy as np
 import typing as T
-import h5py
 from pathlib import Path
-import Pk_library as PKL
-import MAS_library as MASL
-import pyfftw
 
+import h5py
+import hdf5plugin as _  # noqa
 import joblib
+import MAS_library as MASL
+import numpy as np
+import Pk_library as PKL
+import pyfftw
 
 
 def main():
