@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import h5py
+import hdf5plugin as _  # noqa
 import joblib
 import MAS_library.MAS_library as MASL
 import numpy as np
