@@ -26,6 +26,7 @@ make-mesh = "camels_post.make_mesh:main"
 disperse2hdf5 = "camels_post.disperse2hdf5:main"
 camels-post = "camels_post.postprocess:main"
 combine-IC = "camels_post.combine_IC:main"
+make-virtual-snap = "camels_post.virtual_snap:main"
 
 [build-system]
 requires = ["hatchling"]
