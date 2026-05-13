@@ -351,7 +351,7 @@ function run-sublink() {
 		mkdir -p -- "${SUBLINK_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
-			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
 			: $((n++))
 		done
@@ -394,7 +394,7 @@ function run-sublink() {
 		mkdir -p -- "${SUBLINK_GAL_OUTPUT}/subfind"
 		n=0
 		for i in "${ALL_SNAPS[@]}"; do
-			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/groups_%03d.hdf5" $n)"
+			ln -sfr "$(printf "${SUBFIND_OUTPUT}/groups_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/fof_subhalo_tab_%03d.hdf5" $n)"
 			ln -sfr "$(printf "${SUBFIND_OUTPUT}/snap-groupordered-storeids_%03d.hdf5" "$i")" "$(printf "${SUBLINK_GAL_OUTPUT}/subfind/snap_%03d.hdf5" $n)"
 			: $((n++))
 		done
