@@ -9,7 +9,7 @@ please file an issue on github. If you use `camels-post` to generate data for a
 publication, I ask that you please note this in an acknowledgments section.
 
 ### Quick Navigation
-  * [Data Products](#data_products)
+  * [Data Products](#data-products)
   * [Installation](#installation)
   * [Usage](#usage)
   * [Configuration](#configuration)
@@ -227,7 +227,7 @@ no such file exists, turn this option off by setting it to "no".
   preset directory.
 - [ ] Move swift2gadget to this package
 - [ ] 50Mpc
-- [ ] Allow snapshots to not all be in the form path/to/snap_<snapNumber>.hdf5
+- [ ] Allow snapshots to not all be in the form `path/to/snap_<snapNumber>.hdf5`
 - [ ] Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
   everything being like SIMBA. Currently the pipeline breaks if, for example,
   a snapshot has background DM type 2.
@@ -248,3 +248,5 @@ no such file exists, turn this option off by setting it to "no".
 - [ ] Allow for zero-padded ALL_SNAPS
 - [ ] Differentiate subfind for nbody and for hydro in documentation (and for
   swimba_DM)
+- [ ] Remove uv dependency. Move the python scripts into the package itself
+  rather than inline in the bash script
