@@ -93,7 +93,6 @@ function main() {
 	pwd=$(pwd)
 	pwd_without_leading=${pwd#/}
 	export SIM_ROOT=${pwd_without_leading////-}
-	module load uv
 	export HDF5_PLUGIN_PATH=$(uv run --with hdf5plugin python -c "import hdf5plugin; print(hdf5plugin.PLUGIN_PATH)")
 
 	# If -f or --force, remove all generated post-processing so we can start fresh
@@ -156,18 +155,6 @@ function main() {
 }
 
 function run-subfind() {
-	# Which modules you load may vary depending on what cluster you're on.
-	module --force purge
-	module load modules/2.0-20220630
-	module load gcc/7.5.0
-	module load openmpi/4.0.7
-	module load hdf5/mpi-1.10.8
-	module load gmp/6.2.1
-	module load fftw/3.3.10
-	module load openblas/threaded-0.3.20
-	module load gsl/2.7
-	module load hwloc/2.7.1
-
 	read -r Om Ol Ob h box_size < <(
 		python <<-EOF
 			import h5py
@@ -359,19 +346,6 @@ function run-sublink() {
 		[ -e "${SUBLINK_OUTPUT}/tree_extended.hdf5" ] &&
 		[ -e "${SUBLINK_OUTPUT}/offsets/" ]); then
 
-		# Which modules you load may vary depending on what cluster you're on.
-		module --force purge
-		module load modules/2.0-20220630
-		module load python/3.9.12
-		module load slurm
-		module load gcc/10.3.0
-		module load openmpi/4.0.7
-		module load hdf5/mpi-1.10.8
-		module load gmp/6.2.1
-		module load fftw/3.3.10
-		module load openblas/threaded-0.3.20
-		module load gsl/2.7
-
 		mkdir -p -- "${SUBLINK_OUTPUT}"
 
 		mkdir -p -- "${SUBLINK_OUTPUT}/subfind"
@@ -414,19 +388,6 @@ function run-sublink() {
 		[ -e "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5" ] &&
 		[ -e "${SUBLINK_GAL_OUTPUT}/offsets/" ]) &&
 		h5ls "$(get-gadget-snapshot "${ALL_SNAPS[0]}")/PartType0" &>/dev/null; then
-
-		# Which modules you load may vary depending on what cluster you're on.
-		module --force purge
-		module load modules/2.0-20220630
-		module load python/3.9.12
-		module load slurm
-		module load gcc/10.3.0
-		module load openmpi/4.0.7
-		module load hdf5/mpi-1.10.8
-		module load gmp/6.2.1
-		module load fftw/3.3.10
-		module load openblas/threaded-0.3.20
-		module load gsl/2.7
 
 		mkdir -p -- "${SUBLINK_GAL_OUTPUT}"
 
@@ -472,9 +433,6 @@ function run-rockstar() {
 		return
 	fi
 
-	module --force purge
-	module load modules/2.0-20220630
-	module load hdf5/1.10.8
 	mkdir -p -- "${ROCKSTAR_OUTPUT}"
 	# This could probably be done a bit cleaner with a quick python line, but whatever.
 	box_size=$(($(h5dump --attribute=/Header/BoxSize --noindex "$(get-gadget-snapshot "${ALL_SNAPS[0]}")" | sed -n "6p") / 1000))
@@ -582,12 +540,7 @@ function run-cmd() {
 	# It's mainly based on Paco's CMD code, but I've remade it from scratch to hopefully make it a bit easier to extend.
 	# I've also made it parallelized without using mpi, since I've historically had consistency issues with mpi4py.
 
-	module load modules/2.4-20250724
-	module load gcc/13.3.0
-	module load eigen/3.4.0
-
 	snapshot="$(get-gadget-snapshot "${ALL_SNAPS[0]}")"
-	module load hdf5
 	if h5ls "${snapshot}/PartType0" &>/dev/null; then
 		target_2d=12
 		target_3d=180
@@ -651,13 +604,6 @@ function run-disperse {
 
 	mkdir -p -- "${DISPERSE_OUTPUT}"
 
-	module --force purge
-	module load modules/2.4-20250724
-	module load openblas/single-0.3.29
-	module load gsl/2.7.1
-	module load flexiblas/3.4.2
-	module load cfitsio/4.5.0
-
 	read -r Om Ol Ok h w box_size < <(python -c "import h5py; f=h5py.File('$(get-gadget-snapshot "$snap")'); h=f['Header'].attrs; print(h['Omega0'], h['OmegaLambda'], 1 - h['Omega0'] - h['OmegaLambda'], h['HubbleParam'], '-1')")
 
 	# make-mesh is included as part of my postprocessing package
@@ -702,7 +648,6 @@ ensure_count() {
 function check() {
 	n_snap=${#ALL_SNAPS[@]}
 	snapshot="$(get-gadget-snapshot "${ALL_SNAPS[0]}")"
-	module load hdf5
 	if h5ls "${snapshot}/PartType0" &>/dev/null; then
 		n_body="n"
 	else

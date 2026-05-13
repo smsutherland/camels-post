@@ -223,28 +223,28 @@ parameters are given by the CosmoAstroSeed*.txt file in the parent directory. If
 no such file exists, turn this option off by setting it to "no".
 
 ### To-Dos
-- Make the preset list populate automatically based on the contents of the
+- [ ] Make the preset list populate automatically based on the contents of the
   preset directory.
-- Move swift2gadget to this package
-- 50Mpc
-- Allow snapshots to not all be in the form path/to/snap_<snapNumber>.hdf5
-- Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
+- [ ] Move swift2gadget to this package
+- [ ] 50Mpc
+- [ ] Allow snapshots to not all be in the form path/to/snap_<snapNumber>.hdf5
+- [ ] Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
   everything being like SIMBA. Currently the pipeline breaks if, for example,
   a snapshot has background DM type 2.
-- restart_job.sh
-- Verify configuration validity at start of script.
-- Automatically determine CMD snapshots from redshifts in the snapshots.
-- Document snapshot format minimum requirements.
-- Improve my tooling to use multi-file snapshots.
-- Combine-IC should make a virtual snapshot if combining hdf5 snapshots.
-- Rename combine-IC to combine-file.
-- Try to reconstruct groupordered snapshots based on subfind output.
-- Option to control which steps run.
-- Rename outputs to better match names in CAMELS.
-- Check how the subfind differ between our arepo and the public version.
-- Make modules more generalisable.
-- specify MPI dependency
-- Determine minimum Arepo build
-- Allow for zero-padded ALL_SNAPS
-- Differentiate subfind for nbody and for hydro in documentation (and for
+- [ ] restart_job.sh
+- [ ] Verify configuration validity at start of script.
+- [ ] Automatically determine CMD snapshots from redshifts in the snapshots.
+- [ ] Document snapshot format minimum requirements.
+- [ ] Improve my tooling to use multi-file snapshots.
+- [ ] Combine-IC should make a virtual snapshot if combining hdf5 snapshots.
+- [ ] Rename combine-IC to combine-file.
+- [ ] Try to reconstruct groupordered snapshots based on subfind output.
+- [ ] Option to control which steps run.
+- [x] Rename outputs to better match names in CAMELS.
+- [ ] Check how the subfind differ between our arepo and the public version.
+- [x] Make modules more generalisable.
+- [ ] specify MPI dependency
+- [ ] Determine minimum Arepo build
+- [ ] Allow for zero-padded ALL_SNAPS
+- [ ] Differentiate subfind for nbody and for hydro in documentation (and for
   swimba_DM)

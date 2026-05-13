@@ -42,6 +42,12 @@ def main():
         choices=["swimba", "gadget-nbody"],
         default="swimba",
     )
+    parser.add_argument(
+        "--system",
+        help="What system are we running on? This helps setup the shell environment.",
+        choices=["none", "rusty", "popeye"],
+        default="none",
+    )
     args = parser.parse_args()
     dirs: set[Path] = set(d.resolve() for d in args.dirs)
     target: Path = args.target.resolve()
@@ -50,6 +56,7 @@ def main():
     force: bool = args.force
     force_flag: str = " -f" if force else ""
     preset: str = args.preset
+    system: str = args.system
 
     target.mkdir(exist_ok=True)
 
@@ -58,6 +65,11 @@ def main():
 
     with open(Path(__file__).parent / "presets" / (preset + ".sh")) as f:
         preset = f.read()
+
+    if system != "none":
+        preset += "\n"
+        with open(Path(__file__).parent / "systems" / (system + ".sh")) as f:
+            preset += f.read()
 
     post_process_file = post_process_file.replace("PRESET_OPTIONS", preset)
 
