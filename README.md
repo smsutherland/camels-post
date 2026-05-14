@@ -189,14 +189,6 @@ snapshots, 4 vs 8 byte particle IDs). Other parts of the pipeline require
 single file snapshots ([so convert as necessary](#convert-snaps)), but make sure
 to use the correct ID length.
 
-#### *_PTYPES
-
-This is a WIP feature currently. BARYON_PTYPES should be an array with the
-particle types which are baryons. For a hydrodynamic run this should be 0, 4,
-and 5 for compatability with all the tools. For dark matter only runs, this
-array should be empty. DM_PTYPES should be an array of just 1. This option will
-eventually be removed.
-
 #### CMD_SNAPSHOTS
 
 In the CAMELS Multifield Dataset, we make 3D grids for z = 0, 0.5, 1, 1.5, and
@@ -228,7 +220,7 @@ no such file exists, turn this option off by setting it to "no".
 - [ ] Move swift2gadget to this package
 - [ ] 50Mpc
 - [ ] Allow snapshots to not all be in the form `path/to/snap_<snapNumber>.hdf5`
-- [ ] Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
+- [x] Either make all the parts use BARYON_PTYPES and DM_PTYPES, or enforce
   everything being like SIMBA. Currently the pipeline breaks if, for example,
   a snapshot has background DM type 2.
 - [ ] restart_job.sh
@@ -248,5 +240,5 @@ no such file exists, turn this option off by setting it to "no".
 - [ ] Allow for zero-padded ALL_SNAPS
 - [ ] Differentiate subfind for nbody and for hydro in documentation (and for
   swimba_DM)
-- [ ] Remove uv dependency. Move the python scripts into the package itself
+- [x] Remove uv dependency. Move the python scripts into the package itself
   rather than inline in the bash script

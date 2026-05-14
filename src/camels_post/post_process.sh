@@ -93,7 +93,7 @@ function main() {
 	pwd=$(pwd)
 	pwd_without_leading=${pwd#/}
 	export SIM_ROOT=${pwd_without_leading////-}
-	export HDF5_PLUGIN_PATH=$(uv run --with hdf5plugin python -c "import hdf5plugin; print(hdf5plugin.PLUGIN_PATH)")
+	export HDF5_PLUNGIN_PATH=$(camels-utils hdf5-path)
 
 	# If -f or --force, remove all generated post-processing so we can start fresh
 	# If you only want to re-run one particular part of the pipeline, you'll have to manually delete it's corresponding outputs.
@@ -155,30 +155,7 @@ function main() {
 }
 
 function run-subfind() {
-	read -r Om Ol Ob h box_size < <(
-		python <<-EOF
-			import h5py
-			import numpy as np
-			f = h5py.File('$(get-gadget-snapshot "${ALL_SNAPS[0]}")')
-			h = f['Header'].attrs
-			M = 0.0
-			Mb = 0.0
-			for p in ($(printf "%d, " "${DM_PTYPES[@]}")):
-			    if "PartType" + str(p) not in f: continue
-			    if "Masses" in f["PartType" + str(p)]:
-			        M += np.sum(f["PartType" + str(p)]["Masses"][:])
-			    else:
-			        M += h["MassTable"][p] * h["NumPart_Total"][p]
-			for p in ($(printf "%d, " "${BARYON_PTYPES[@]}")):
-			    if "PartType" + str(p) not in f: continue
-			    if "Masses" in f["PartType" + str(p)]:
-			        Mb += np.sum(f["PartType" + str(p)]["Masses"][:])
-			    else:
-			        Mb += h["MassTable"][p] * h["NumPart_Total"][p]
-			M += Mb
-			print("%6f %6f %6f %6f %d" % (h['Omega0'], h['OmegaLambda'], h['Omega0'] * Mb / M, h['HubbleParam'], round(h["BoxSize"])))
-		EOF
-	)
+	read -r Om Ol Ob h box_size < <(camels-utils cosmo-calc $(get-gadget-snapshot "${ALL_SNAPS[0]}"))
 
 	mkdir -p -- "$SUBFIND_OUTPUT"
 	cat >"${SUBFIND_OUTPUT}/arepo_subfind_param.txt" <<-EOF
