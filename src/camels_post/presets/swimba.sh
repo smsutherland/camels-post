@@ -110,10 +110,6 @@ ROCKSTAR_ROOT=/mnt/ceph/users/camels/Codes/rockstar-galaxies/
 CONSISTENT_TREE_ROOT=/mnt/ceph/users/camels/Codes/consistent-trees/
 DISPERSE_ROOT=/mnt/home/ssutherland/codes/DisPerSE/bin/
 
-# Particle types which are baryons
-BARYON_PTYPES=(0 4 5)
-# Particle types which are dark matter
-DM_PTYPES=(1)
 # In the CAMELS Multifield Dataset, we make 3D grids for z = 0, 0.5, 1, 1.5, and 2.
 # This should be an array with the snapshot numbers corresponding with these redshifts.
 CMD_SNAPSHOTS=(90 73 61 52 44)

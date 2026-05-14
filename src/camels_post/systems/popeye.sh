@@ -1,8 +1,4 @@
 module purge
-module load modules/2.4
-module load uv
-export PATH="$PATH:$(dirname $(which uv))"
-
 module load modules/2.3
 module load gcc
 module load openmpi
