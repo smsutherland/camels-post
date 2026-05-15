@@ -15,6 +15,7 @@ function get-gadget-ic() {
 # If your snapshots are already gadget-hdf5 compatible, then this part can be omitted. Also you should turn off
 # CLEAN_GADGET_SNAPS and CONVERT_SNAPSHOTS
 function convert-snaps() {
+	rm -fr "/tmp/${SIM_ROOT}/"
 	mkdir -p "/tmp/${SIM_ROOT}/"
 
 	# I'll grant this is a pretty roundabout way to do this.
