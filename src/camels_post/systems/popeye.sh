@@ -23,5 +23,5 @@ module load python
 SUBLINK_ROOT=/mnt/home/ssutherland/codes/SubLink/SubLink_SHORTIDS/
 AREPO_ROOT=/mnt/home/ssutherland/codes/Arepo_subfind_v2/
 ROCKSTAR_ROOT=/mnt/home/ssutherland/codes/rockstar-galaxies_dm/
-CONSISTENT_TREE_ROOT=/mnt/sdceph/users/camels/Codes/consistent-trees/
+CONSISTENT_TREE_ROOT=/mnt/home/ssutherland/codes/consistent-trees/
 DISPERSE_ROOT=/mnt/home/ssutherland/codes/DisPerSE/bin/
