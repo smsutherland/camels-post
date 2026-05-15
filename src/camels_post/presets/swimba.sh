@@ -124,3 +124,7 @@ CONVERT_SNAPSHOTS=yes
 # To get CAMELS parameters in the header for the DisPerSE catalogs, this code uses the cosmoastroseed parameter files present in the camels directories.
 # If this file is not present, or you simply don't care about having the parameter values in the header, then you can turn this off.
 WITH_COSMOASTROSEED=yes
+
+pwd=$(pwd)
+pwd_without_leading=${pwd#/}
+export SIM_ROOT=${pwd_without_leading////-}

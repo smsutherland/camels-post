@@ -90,9 +90,6 @@ function main() {
 	IFS=$'\n'
 	mapfile -t ALL_SNAPS < <(sort -g <<<"${ALL_SNAPS[*]}")
 	unset IFS
-	pwd=$(pwd)
-	pwd_without_leading=${pwd#/}
-	export SIM_ROOT=${pwd_without_leading////-}
 	export HDF5_PLUNGIN_PATH=$(camels-utils hdf5-path)
 
 	# If -f or --force, remove all generated post-processing so we can start fresh
