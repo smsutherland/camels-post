@@ -19,7 +19,7 @@ function convert-snaps() {
 	mkdir -p "/tmp/${SIM_ROOT}/"
 
 	for i in $(seq 0 90); do
-		cp $(printf "./snap_%03d.hdf5" "$i") $(printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5")
+		cp $(printf "./snap_%03d.hdf5" "$i") $(printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5" "$i")
 	done
 
     combine-IC "ICs/ics" "/scratch/${SIM_ROOT}/ic.hdf5"
