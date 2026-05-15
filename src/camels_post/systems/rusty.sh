@@ -5,6 +5,7 @@ module load openmpi
 module load hdf5/mpi
 module load fftw/mpi
 module load openblas/threaded
+module load flexiblas
 module load cfitsio
 module load gsl
 module load gmp
