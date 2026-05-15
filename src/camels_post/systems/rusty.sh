@@ -10,3 +10,17 @@ module load gsl
 module load gmp
 module load eigen
 module load python
+
+# The _ROOT variables are for where the various codes live.
+# There are four version of Sublink:
+# - 4 byte particle IDs, single-file snapshots
+# - 4 byte particle IDs, multi-file snapshots
+# - 8 byte particle IDs, single-file snapshots
+# - 8 byte particle IDs, multi-file snapshots
+# This is the first of those versions.
+# You should change SUBLINK_ROOT to point to the corresponding version you need.
+SUBLINK_ROOT=/mnt/home/ssutherland/codes/SubLink/SubLink_SHORTIDS/
+AREPO_ROOT=/mnt/home/ssutherland/codes/Arepo_subfind_v2/
+ROCKSTAR_ROOT=/mnt/ceph/users/camels/Codes/rockstar-galaxies/
+CONSISTENT_TREE_ROOT=/mnt/ceph/users/camels/Codes/consistent-trees/
+DISPERSE_ROOT=/mnt/home/ssutherland/codes/DisPerSE/bin/
