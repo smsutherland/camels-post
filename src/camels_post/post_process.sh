@@ -496,7 +496,7 @@ function run-consistent_tree() {
 	popd
 	if [ ! -e "${output_dir}/trees/tree_0_0_0.dat" ]; then
 		echo "no ${output_dir}/trees/tree_0_0_0.dat, probably failed"
-		return
+		false
 	else
 		echo "${output_dir}/trees/tree_0_0_0.dat exists, probably succeeded"
 	fi
