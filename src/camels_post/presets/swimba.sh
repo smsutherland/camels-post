@@ -4,18 +4,18 @@
 # If this is not the case, you may have to alter things further in the code to make it work.
 # I can probably set this up such that it symlinks files to be the correct format, bypassing this requirement.
 function get-gadget-snapshot() {
-	printf "/scratch/${SIM_ROOT}/snap_%03d.hdf5" "$1"
+	printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5" "$1"
 }
 
 function get-gadget-ic() {
-	echo "/scratch/${SIM_ROOT}/ic.hdf5"
+	echo "/tmp/${SIM_ROOT}/ic.hdf5"
 }
 
 # This step is necessary for SWIMBA because many of the steps don't work natively with swift-style snapshots.
 # If your snapshots are already gadget-hdf5 compatible, then this part can be omitted. Also you should turn off
 # CLEAN_GADGET_SNAPS and CONVERT_SNAPSHOTS
 function convert-snaps() {
-	mkdir -p "/scratch/${SIM_ROOT}/"
+	mkdir -p "/tmp/${SIM_ROOT}/"
 
 	# I'll grant this is a pretty roundabout way to do this.
 	# For now though this is effectively a for loop going through every snapshot.
@@ -23,7 +23,7 @@ function convert-snaps() {
 	# Also, swift2gadget is included in my Swimba Pipeline, not my postprocessing package.
 	seq 0 90 | xargs -P"$cpus" -I{} bash -c '
         SOURCE_SNAP=$(printf "snaps/snapshot_%04d.hdf5" {})
-        DEST_SNAP=$(printf "/scratch/${SIM_ROOT}/snap_%03d.hdf5" {})
+        DEST_SNAP=$(printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5" {})
 
         # Does the gadget snapshot already exist?
         if [ -e "${DEST_SNAP}" ]; then
@@ -34,8 +34,8 @@ function convert-snaps() {
         swift2gadget "${SOURCE_SNAP}" "${DEST_SNAP}"
     '
 
-	if [ ! -e "/scratch/${SIM_ROOT}/ic.hdf5" ]; then
-		combine-IC ICs/ics "/scratch/${SIM_ROOT}/ic.hdf5"
+	if [ ! -e "/tmp/${SIM_ROOT}/ic.hdf5" ]; then
+		combine-IC ICs/ics "/tmp/${SIM_ROOT}/ic.hdf5"
 	fi
 }
 
@@ -43,7 +43,7 @@ function convert-snaps() {
 # For example, in SWIMBA I put the converted snapshots in node-local scratch storage.
 # Slurm on rusty will clean this up itself, but it's better to clean it up myself.
 function cleanup() {
-	rm -r "/scratch/${SIM_ROOT}/"
+	rm -r "/tmp/${SIM_ROOT}/"
 }
 
 # Get softening in kpc / h
