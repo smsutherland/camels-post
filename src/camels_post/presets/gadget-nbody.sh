@@ -4,27 +4,31 @@
 # If this is not the case, you may have to alter things further in the code to make it work.
 # I can probably set this up such that it symlinks files to be the correct format, bypassing this requirement.
 function get-gadget-snapshot() {
-	printf "./snap_%03d.hdf5" "$1"
+	printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5" "$1"
 }
 
 function get-gadget-ic() {
-	echo "./ICs/ic_combined.hdf5"
+	echo "/tmp/${SIM_ROOT}/ic.hdf5"
 }
 
 # This step is necessary for SWIMBA because many of the steps don't work natively with swift-style snapshots.
 # If your snapshots are already gadget-hdf5 compatible, then this part can be omitted. Also you should turn off
 # CLEAN_GADGET_SNAPS and CONVERT_SNAPSHOTS
 function convert-snaps() {
-	if [ ! -e "./ICs/ic_combined.hdf5" ]; then
-		combine-IC "ICs/ics" "ICs/ic_combined.hdf5"
-	fi
+	mkdir -p "/tmp/${SIM_ROOT}/"
+
+	for i in $(seq 0 90); do
+		cp $(printf "./snap_%03d.hdf5" "$i") $(printf "/tmp/${SIM_ROOT}/snap_%03d.hdf5")
+	done
+
+    combine-IC "ICs/ics" "/scratch/${SIM_ROOT}/ic.hdf5"
 }
 
 # Any additional cleanup which needs to happen.
 # For example, in SWIMBA I put the converted snapshots in node-local scratch storage.
 # Slurm on rusty will clean this up itself, but it's better to clean it up myself.
 function cleanup() {
-	:
+	rm -r "/tmp/${SIM_ROOT}/"
 }
 
 # Get softening in kpc / h
@@ -106,3 +110,7 @@ CONVERT_SNAPSHOTS=yes
 # To get CAMELS parameters in the header for the DisPerSE catalogs, this code uses the cosmoastroseed parameter files present in the camels directories.
 # If this file is not present, or you simply don't care about having the parameter values in the header, then you can turn this off.
 WITH_COSMOASTROSEED=yes
+
+pwd=$(pwd)
+pwd_without_leading=${pwd#/}
+export SIM_ROOT=${pwd_without_leading////-}
