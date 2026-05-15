@@ -83,20 +83,6 @@ CMD_OUTPUT=./CMD/
 PK_OUTPUT=./Pk/
 DISPERSE_OUTPUT=./DisPerSE/
 
-# The _ROOT variables are for where the various codes live.
-# There are four version of Sublink:
-# - 4 byte particle IDs, single-file snapshots
-# - 4 byte particle IDs, multi-file snapshots
-# - 8 byte particle IDs, single-file snapshots
-# - 8 byte particle IDs, multi-file snapshots
-# This is the first of those versions.
-# You should change SUBLINK_ROOT to point to the corresponding version you need.
-SUBLINK_ROOT=/mnt/home/ssutherland/codes/SubLink/SubLink_SHORTIDS/
-AREPO_ROOT=/mnt/home/ssutherland/codes/Arepo_subfind_v2/
-ROCKSTAR_ROOT=/mnt/ceph/users/camels/Codes/rockstar-galaxies/
-CONSISTENT_TREE_ROOT=/mnt/ceph/users/camels/Codes/consistent-trees/
-DISPERSE_ROOT=/mnt/home/ssutherland/codes/DisPerSE/bin/
-
 # In the CAMELS Multifield Dataset, we make 3D grids for z = 0, 0.5, 1, 1.5, and 2.
 # This should be an array with the snapshot numbers corresponding with these redshifts.
 CMD_SNAPSHOTS=(90 73 61 52 44)
