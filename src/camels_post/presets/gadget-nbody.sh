@@ -29,7 +29,7 @@ function convert-snaps() {
 # For example, in SWIMBA I put the converted snapshots in node-local scratch storage.
 # Slurm on rusty will clean this up itself, but it's better to clean it up myself.
 function cleanup() {
-	rm -r "/tmp/${SIM_ROOT}/"
+	rm -fr "/tmp/${SIM_ROOT}/"
 }
 
 # Get softening in kpc / h
