@@ -90,7 +90,7 @@ function main() {
 	IFS=$'\n'
 	mapfile -t ALL_SNAPS < <(sort -g <<<"${ALL_SNAPS[*]}")
 	unset IFS
-	export HDF5_PLUNGIN_PATH=$(camels-utils hdf5-path)
+	export HDF5_PLUGIN_PATH=$(camels-utils hdf5-path)
 
 	# If -f or --force, remove all generated post-processing so we can start fresh
 	# If you only want to re-run one particular part of the pipeline, you'll have to manually delete it's corresponding outputs.
