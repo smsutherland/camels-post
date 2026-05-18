@@ -93,8 +93,7 @@ def main():
         f.write("#!/bin/bash\n")
         f.write(f"#SBATCH --ntasks={ntasks}\n")
         f.write(f"#SBATCH --cpus-per-task={parallel}\n")
-        f.write("#SBATCH --job-name=SWIMBA_postprocess\n")
-        f.write("#SBATCH --partition=cmbas\n")
+        f.write("#SBATCH --job-name=camels-post\n")
         f.write("module load disBatch\n")
         f.write("disBatch tasks\n")
 
