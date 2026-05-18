@@ -613,7 +613,7 @@ ensure_exists() {
 }
 
 ensure_count() {
-	if [ $(ls $1 | wc -l) -lt "$2" ]; then
+	if [ $(ls -- $1 | wc -l) -lt "$2" ]; then
 		echo missing "$1" got $(ls $1 | wc -l) instead of "$2"
 		result=1
 	fi
@@ -629,25 +629,25 @@ function check() {
 	fi
 
 	result=0
-	ensure_count "subfind/groups_*" $n_snap
-	ensure_exists sublink/tree.hdf5 sublink/tree_extended.hdf5
-	ensure_count "sublink/offsets/offsets_*.hdf5" $n_snap
+	ensure_count "${SUBFIND_OUTPUT}/groups_*" $n_snap
+	ensure_exists "${SUBLINK_OUTPUT}/tree.hdf5" "${SUBLINK_OUTPUT}/tree_extended.hdf5"
+	ensure_count "${SUBLINK_OUTPUT}/offsets/offsets_*.hdf5" $n_snap
 	if [ $n_body = "n" ]; then
-		ensure_exists sublink_gal/tree.hdf5 sublink_gal/tree_extended.hdf5
-		ensure_count "sublink_gal/offsets/offsets_*.hdf5" $n_snap
+		ensure_exists "${SUBLINK_GAL_OUTPUT}/tree.hdf5" "${SUBLINK_GAL_OUTPUT}/tree_extended.hdf5"
+		ensure_count "${SUBLINK_GAL_OUTPUT}/offsets/offsets_*.hdf5" $n_snap
 	fi
-	ensure_exists rockstar/trees/tree_0_0_0.dat rockstar/trees/locations.dat rockstar/trees/forests.list
-	ensure_count rockstar/hlists/ $(($n_snap - 20)) # This isn't an exact count since it'll skip snapshots with not enough halos
+	ensure_exists "${ROCKSTAR_OUTPUT}/trees/tree_0_0_0.dat" "${ROCKSTAR_OUTPUT}/trees/locations.dat" "${ROCKSTAR_OUTPUT}/trees/forests.list"
+	ensure_count "${ROCKSTAR_OUTPUT}/hlists/" $(($n_snap - 20)) # This isn't an exact count since it'll skip snapshots with not enough halos
 	if [ $n_body = "n" ]; then
-		ensure_count CMD/2D_maps 12
-		ensure_count CMD/3D_grids $((3 * 5 * 12))
-		ensure_count Pk/ $((($n_snap + 1) * 5))
+		ensure_count "${CMD_OUTPUT}/2D_maps" 12
+		ensure_count "${CMD_OUTPUT}/3D_grids" $((3 * 5 * 12))
+		ensure_count "${PK_OUTPUT}/" $((($n_snap + 1) * 5))
 	else
-		ensure_count CMD/2D_maps 1
-		ensure_count CMD/3D_grids $((3 * 5))
-		ensure_count Pk/ $(($n_snap + 1))
+		ensure_count "${CMD_OUTPUT}/2D_maps" 1
+		ensure_count "${CMD_OUTPUT}/3D_grids" $((3 * 5))
+		ensure_count "${PK_OUTPUT}/" $(($n_snap + 1))
 	fi
-	ensure_exists DisPerSE/massgrid-disperse_G-256_S-02_c500-output_file_090.hdf5
+	ensure_exists "${DISPERSE_OUTPUT}/massgrid-disperse_G-256_S-02_c500-output_file_090.hdf5"
 
 	if [ "$result" -eq 0 ]; then
 		exit 0
