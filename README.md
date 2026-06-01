@@ -242,3 +242,6 @@ no such file exists, turn this option off by setting it to "no".
   swimba_DM)
 - [x] Remove uv dependency. Move the python scripts into the package itself
   rather than inline in the bash script
+- [ ] Check tasks depends on converted snapshots to determine if it's an nbody
+  run. Make being nbody a config option.
+
