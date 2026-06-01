@@ -569,8 +569,8 @@ def make_grids(data: SnapshotData, verbose: bool = False, grid: int = 256):
         dm_fields = {
             "Mcdm": data.dm_mass,
         }
-        # If only dark matter
-        if data.has_parts.sum() == data.has_parts[1]:
+        # If not only dark matter
+        if data.has_parts.sum() != data.has_parts[1]:
             dm_fields["Vcdm"] = data.dm_velocity * data.dm_mass
 
         field_names = []
