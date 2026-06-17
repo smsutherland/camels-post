@@ -1,5 +1,4 @@
 import argparse
-import typing as T
 from pathlib import Path
 
 import h5py
