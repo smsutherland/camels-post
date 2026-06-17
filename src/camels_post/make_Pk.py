@@ -33,7 +33,6 @@ def main():
     snapshots: list[Path] = args.snapshots
     target: Path = args.target
     parallelism: int = args.parallel
-    verbose: bool = args.verbose
     force_dm_only: bool = args.dm
 
     pyfftw.config.NUM_THREADS = parallelism
