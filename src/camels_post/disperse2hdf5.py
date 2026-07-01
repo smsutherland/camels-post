@@ -530,7 +530,7 @@ def save_to_hdf5_disperse(data, hdf5_filename):
                 elif isinstance(value, str):
                     # Save strings as attributes
                     print(f"Saving string as attribute: {key}")
-                    group.attrs[key] = value
+                    group.attrs[key] = str(value)
                 else:
                     # Serialize unsupported types to strings
                     print(f"Serializing unsupported type for key {key}: {type(value)}")
