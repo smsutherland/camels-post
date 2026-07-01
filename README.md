@@ -8,6 +8,12 @@ and N-body simulations. If you encounter any problems using `camels-post`,
 please file an issue on github. If you use `camels-post` to generate data for a
 publication, I ask that you please note this in an acknowledgments section.
 
+### WARNING
+This is not a "one size fits all" solution. Due to the highly varied nature of
+simulations, it is nigh on impossible to create such a solution. `camels-post`
+is meant to get you 90% of the way to a solution. The remaining 10% will require
+testing and tweaking the script on your own to fit your needs.
+
 ### Quick Navigation
   * [Data Products](#data-products)
   * [Installation](#installation)
