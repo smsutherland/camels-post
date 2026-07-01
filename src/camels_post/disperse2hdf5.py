@@ -52,14 +52,13 @@ def main():
     }
 
     if param_file is not None:
-        sim_dir: Path = ndskel.relative_to(param_file.parent).parents[-2]
+        sim_dir: Path = Path.cwd().relative_to(param_file.parent)
         cosmoastrotable: Table = Table.read(param_file, format=table_format)
         name = cosmoastrotable.colnames[0]
         cosmoastrotable.add_index(name)
         row = cosmoastrotable.loc[str(sim_dir)]
         row_dict = {k: row[k] for k in row.colnames if k != name and k != "seed"}
-        structured_data["header"] = {}
-        structured_data["header"]["parameters"] = row_dict
+        structured_data["header"] = {"parameters": row_dict}
 
     save_to_hdf5_disperse(
         structured_data,
