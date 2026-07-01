@@ -14,6 +14,7 @@ def main():
     parser.add_argument("--target", type=Path, default=Path.cwd())
     parser.add_argument("--boxsize", type=float, default=25000)
     parser.add_argument("--grid", type=int, default=256)
+    parser.add_argument("--table-format", default="ascii.commented_header")
 
     args = parser.parse_args()
     ndskel: Path = args.ndskel.resolve()
@@ -24,6 +25,7 @@ def main():
     target: Path = args.target
     boxsize: float = args.boxsize
     grid: int = args.grid
+    table_format: str = args.table_format
 
     with h5py.File(subfind) as f:
         subhalo_positions: np.ndarray = f["Subhalo/SubhaloPos"][:]
@@ -51,7 +53,7 @@ def main():
 
     if param_file is not None:
         sim_dir: Path = ndskel.relative_to(param_file.parent).parents[-2]
-        cosmoastrotable: Table = Table.read(param_file, format="ascii.basic")
+        cosmoastrotable: Table = Table.read(param_file, format=table_format)
         name = cosmoastrotable.colnames[0]
         cosmoastrotable.add_index(name)
         row = cosmoastrotable.loc[str(sim_dir)]
