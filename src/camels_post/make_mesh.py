@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--sigma", type=int, default=2)
     parser.add_argument("--parallel", "-p", type=int, default=joblib.cpu_count())
     parser.add_argument("--gas", action="store_true")
+    parser.add_argument("--normalized", action="store_true")
 
     args = parser.parse_args()
     snapshots: list[Path] = args.snapshots
@@ -35,6 +36,7 @@ def main():
     sigma: int = args.sigma
     parallel: int = args.parallel
     gas: bool = args.gas
+    normalized: bool = args.normalized
 
     ptype = 0 if gas else 1
 
@@ -43,13 +45,25 @@ def main():
     parallel = min(parallel, len(snapshots))
     joblib.parallel.Parallel(n_jobs=parallel)(
         joblib.delayed(make_mesh)(
-            snap, grid=grid, sigma=sigma, target=target, ptype=ptype
+            snap,
+            grid=grid,
+            sigma=sigma,
+            target=target,
+            ptype=ptype,
+            normalized=normalized,
         )
         for snap in snapshots
     )
 
 
-def make_mesh(snap: Path, grid: int, sigma: int, target: Path, ptype: int = 1):
+def make_mesh(
+    snap: Path,
+    grid: int,
+    sigma: int,
+    target: Path,
+    ptype: int = 1,
+    normalized: bool = False,
+):
     with h5py.File(snap) as f:
         coordinates: np.ndarray = f[f"PartType{ptype}/Coordinates"][:]
         if "Masses" in f[f"PartType{ptype}"]:
@@ -78,6 +92,8 @@ def make_mesh(snap: Path, grid: int, sigma: int, target: Path, ptype: int = 1):
             * 3
         ),
     )
+    if normalized:
+        massgrid /= massgrid.mean()
 
     snapnum = snap.stem[-3:]
 
