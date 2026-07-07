@@ -72,7 +72,9 @@ def make_mesh(
             masses = np.full(
                 coordinates.shape[0], f["Header"].attrs["MassTable"][ptype] * 1e10
             )
-        boxsize: float = f["Header"].attrs["BoxSize"]
+        boxsize = f["Header"].attrs["BoxSize"]
+        if not isinstance(boxsize, float):
+            boxsize = float(boxsize[0])
         coordinates %= boxsize
     mesh = Meshoid(
         coordinates,
