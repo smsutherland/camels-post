@@ -600,7 +600,7 @@ function run-disperse {
 
 	# Cleanup
 	find "${DISPERSE_OUTPUT}" -mindepth 1 -not -name '*.hdf5' -delete
-	mv "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}-output_file_${snap_str}.hdf5" "${DISPERSE_OUTPUT}/massgrid-disperse_G-${grid}_S-${sigma_str}_c${cut_str}-output_file_${snap_str}.hdf5"
+	mv "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}_c${cut_str}-output_file.hdf5" "${DISPERSE_OUTPUT}/massgrid-disperse_G-${grid}_S-${sigma_str}_c${cut_str}-output_file_${snap_str}.hdf5"
 }
 
 ensure_exists() {

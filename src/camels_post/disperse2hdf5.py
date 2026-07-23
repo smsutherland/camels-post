@@ -62,7 +62,7 @@ def main():
 
     save_to_hdf5_disperse(
         structured_data,
-        target / (ndskel.stem.split(".", maxsplit=1)[0] + "-output_file_090.hdf5"),
+        target / (ndskel.stem.split(".", maxsplit=1)[0] + "-output_file.hdf5"),
     )
 
 
