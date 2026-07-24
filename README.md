@@ -59,19 +59,19 @@ strictly required.
 
 Installation can be achieved via pip:
 
-```
+```bash
 pip install 'git+https://github.com/smsutherland/camels-post'
 ```
 
 Or via uv:
 
-```
+```bash
 uv tool install 'git+https://github.com/smsutherland/camels-post'
 ```
 
 Or via pipx:
 
-```
+```bash
 pipx install 'git+https://github.com/smsutherland/camels-post'
 ```
 
