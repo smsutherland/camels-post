@@ -583,7 +583,7 @@ function run-disperse {
 	# make-mesh is included as part of my postprocessing package
 	make-mesh "$(get-gadget-snapshot "$snap")" --parallel "$cpus" --target "${DISPERSE_OUTPUT}" --grid "$grid" --sigma "$sigma"
 	"${DISPERSE_ROOT}/fieldconv" "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}.fits" -cosmo "$Om" "$Ol" "$Ok" "$h" "$w" -to NDfield -info -outName "masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}" -outDir "${DISPERSE_OUTPUT}"
-	if [ -e "${DISPERSE_OUTPUT}/masscubegrid-G-256_S-${sigma_str}_${snap_str}.MSC" ]; then
+	if [ -e "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}.MSC" ]; then
 		"${DISPERSE_ROOT}/mse" "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}.ND" -cut $cut -upSkl -manifolds -forceLoops -periodicity 111 -nthreads "$cpus" -outName "masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}" -outDir "${DISPERSE_OUTPUT}" -loadMSC "${DISPERSE_OUTPUT}/masscubegrid-G-256_S-02_${snap_str}.MSC"
 	else
 		"${DISPERSE_ROOT}/mse" "${DISPERSE_OUTPUT}/masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}.ND" -cut $cut -upSkl -manifolds -forceLoops -periodicity 111 -nthreads "$cpus" -outName "masscubegrid-G-${grid}_S-${sigma_str}_${snap_str}" -outDir "${DISPERSE_OUTPUT}"
