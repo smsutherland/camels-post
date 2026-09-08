@@ -585,8 +585,13 @@ def make_grids(data: SnapshotData, verbose: bool = False, grid: int = 256):
                 data.box_size, data.dm_position, data.dm_radius, densities_npy, grid
             )
         output_grids *= voxel_volume
-        for i, name in enumerate(field_names):
-            result[name] = output_grids[..., i]
+        if len(output_grids.shape) == 3:
+            # only iterates once
+            for name in field_names:
+                result[name] = output_grids
+        else:
+            for i, name in enumerate(field_names):
+                result[name] = output_grids[..., i]
 
     if data.has_parts[4]:
         m_star = np.zeros((grid, grid, grid), dtype=np.float32)
