@@ -394,13 +394,15 @@ def load_snap(snap: Path, parallelism: int) -> SnapshotData:
         npart = f["Header"].attrs["NumPart_ThisFile"][:]
         has_parts = npart > 0
 
+        box_size = f["Header"].attrs["BoxSize"] / 1000
+
         if has_parts[0]:
             gas_position = f["PartType0/Coordinates"][:] / 1000  # Mpc / h
             gas_velocity = np.linalg.norm(
                 f["PartType0/Velocities"][:], axis=1
             ) / np.sqrt(1.0 + redshift)  # km / s
             gas_mass = f["PartType0/Masses"][:] * 1e10  # Msun / h
-            gas_radius = get_radii(gas_position, parallelism)
+            gas_radius = get_radii(gas_position, box_size, parallelism)
             gas_metallicity = f["PartType0/Metallicity"][:, 0] + 8e-10  # dimensionless
             gas_hI = f["PartType0/NeutralHydrogenAbundance"][:] * gas_mass  # Msun / h
             m_proton = 1.6726e-27  # kg
@@ -464,7 +466,7 @@ def load_snap(snap: Path, parallelism: int) -> SnapshotData:
             dm_velocity = np.linalg.norm(
                 f["PartType1/Velocities"][:], axis=1
             ) / np.sqrt(1.0 + redshift)  # km / s
-            dm_radius = get_radii(dm_position, parallelism)
+            dm_radius = get_radii(dm_position, box_size, parallelism)
             if "Masses" in f["PartType1"]:
                 dm_mass = f["PartType1/Masses"][:] * 1e10  # Msun / h
             else:
@@ -495,8 +497,6 @@ def load_snap(snap: Path, parallelism: int) -> SnapshotData:
             bh_mass = np.empty(0, dtype=np.float32)
             bh_radius = np.empty(0, dtype=np.float32)
 
-        box_size = f["Header"].attrs["BoxSize"] / 1000
-
         return SnapshotData(
             gas_position=gas_position.astype(np.float32, copy=False),
             gas_velocity=gas_velocity.astype(np.float32, copy=False),
@@ -525,9 +525,9 @@ def load_snap(snap: Path, parallelism: int) -> SnapshotData:
         )
 
 
-def get_radii(positions, parallelism):
-    positions %= 25
-    tree = KDTree(positions, boxsize=25)
+def get_radii(positions, boxsize, parallelism):
+    positions %= boxsize
+    tree = KDTree(positions, boxsize=boxsize)
     return tree.query(positions, 32 + 1, workers=parallelism)[0][:, -1]
 
 
